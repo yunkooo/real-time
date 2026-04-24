@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Real-time left",
-  "description": "Shows how much real time is left based on the current YouTube playback speed.",
+  "name": "Real-time",
+  "description": "Shows real remaining time based on the current YouTube playback speed.",
   "version": "0.1.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Real-time left"
+    "default_title": "Real-time"
   },
   "permissions": ["storage"],
   "content_scripts": [

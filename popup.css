@@ -38,12 +38,12 @@
 body {
   background: var(--bg);
   margin: 0;
-  min-width: 190px;
+  min-width: 150px;
 }
 
 .popup {
   color: var(--text-strong);
-  padding: 6px;
+  padding: 4px;
 }
 
 .toggle-card {
@@ -54,10 +54,10 @@ body {
   box-shadow: 0 1px 2px var(--card-shadow);
   cursor: pointer;
   display: flex;
-  gap: 16px;
+  gap: 10px;
   justify-content: center;
-  min-height: 36px;
-  padding: 7px 10px;
+  min-height: 30px;
+  padding: 5px 8px;
   position: relative;
   transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
@@ -71,7 +71,7 @@ body {
 .toggle-copy strong {
   color: var(--text-strong);
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1.35;
   white-space: nowrap;
@@ -87,10 +87,10 @@ body {
   background: var(--switch-off);
   border-radius: 999px;
   display: block;
-  height: 22px;
+  height: 20px;
   position: relative;
   transition: background 140ms ease;
-  width: 38px;
+  width: 34px;
 }
 
 .switch::after {
@@ -98,12 +98,12 @@ body {
   border-radius: 50%;
   box-shadow: 0 2px 8px var(--switch-shadow);
   content: "";
-  height: 18px;
+  height: 16px;
   left: 2px;
   position: absolute;
   top: 2px;
   transition: transform 140ms ease;
-  width: 18px;
+  width: 16px;
 }
 
 .toggle-card input:checked + .switch {
@@ -111,7 +111,7 @@ body {
 }
 
 .toggle-card input:checked + .switch::after {
-  transform: translateX(16px);
+  transform: translateX(14px);
 }
 
 .toggle-card:has(input:focus-visible) {

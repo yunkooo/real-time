@@ -160,9 +160,9 @@
 
   function setPanelContent(panel, model) {
     panel.innerHTML = `
-      <div class="yrtc-panel-title">배속 기준 시간</div>
-      <div class="yrtc-row"><span>현재 배속</span><strong>${formatRate(model.rate)}</strong></div>
-      <div class="yrtc-row"><span>현실 남은 시간</span><strong>${formatDuration(model.realRemaining)}</strong></div>
+      <div class="yrtc-panel-title">Adjusted time</div>
+      <div class="yrtc-row"><span>Speed</span><strong>${formatRate(model.rate)}</strong></div>
+      <div class="yrtc-row"><span>Real time</span><strong>${formatDuration(model.realRemaining)}</strong></div>
     `;
   }
 
