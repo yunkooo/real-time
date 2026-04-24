@@ -22,10 +22,7 @@
       "js": [
         "content-utils.js",
         "content-panel.js",
-        "adapters/youtube.js",
         "adapters/vimeo.js",
-        "adapters/udemy.js",
-        "adapters/inflearn.js",
         "adapters/generic.js",
         "content.js"
       ],

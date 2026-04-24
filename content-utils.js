@@ -4,7 +4,6 @@
   YRTC.constants = {
     STORAGE_KEY: "enabled",
     PANEL_ID: "yrtc-panel",
-    OVERLAY_TRIGGER_ID: "yrtc-video-trigger",
     DEFAULT_STATE: { enabled: true },
     UPDATE_INTERVAL_MS: 500,
     RATE_CACHE_GRACE_MS: 900
@@ -13,12 +12,8 @@
   /**
    * @typedef {Object} VideoAdapter
    * @property {() => HTMLVideoElement | null} findVideo
-   * @property {(video: HTMLVideoElement | null) => HTMLElement | null} findTrigger
-   * @property {(trigger: HTMLElement) => boolean} areControlsVisible
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
-   * @property {(trigger: HTMLElement) => DOMRect | null} [getTriggerRect]
-   * @property {(trigger: HTMLElement, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
-   * @property {(target: HTMLElement, video: HTMLVideoElement | null) => void} [afterUpdate]
+   * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
    * @property {() => void} [cleanup]
    */
 
@@ -74,34 +69,6 @@
       rect.left < window.innerWidth &&
       rect.top < window.innerHeight
     );
-  }
-
-  function findPlayerRect(video) {
-    if (!video?.isConnected) {
-      return null;
-    }
-
-    const videoRect = video.getBoundingClientRect();
-    let bestRect = isVisibleRect(videoRect) ? videoRect : null;
-    let parent = video.parentElement;
-
-    while (parent && parent !== document.body && parent !== document.documentElement) {
-      const rect = parent.getBoundingClientRect();
-      const containsVideo =
-        rect.left <= videoRect.left &&
-        rect.right >= videoRect.right &&
-        rect.top <= videoRect.top &&
-        rect.bottom >= videoRect.bottom;
-      const fitsViewport = rect.width <= window.innerWidth + 2 && rect.height <= window.innerHeight + 2;
-
-      if (containsVideo && fitsViewport && isVisibleRect(rect)) {
-        bestRect = rect;
-      }
-
-      parent = parent.parentElement;
-    }
-
-    return bestRect;
   }
 
   function createRect(left, top, width, height) {
@@ -184,63 +151,10 @@
     return frameRect;
   }
 
-  function createOverlayController(id) {
-    let overlay = null;
-
-    function ensureOverlay() {
-      if (!overlay) {
-        overlay = document.createElement("div");
-        overlay.id = id;
-        overlay.className = "yrtc-video-trigger";
-        overlay.setAttribute("aria-label", "Real-time video duration");
-        document.body.appendChild(overlay);
-      }
-      return overlay;
-    }
-
-    return {
-      position(video, options = {}) {
-        const rect = options.useVideoFrame
-          ? getVideoFrameRect(video, options.fallbackRect)
-          : findPlayerRect(video) || options.fallbackRect?.();
-        if (!rect) {
-          return null;
-        }
-
-        const target = ensureOverlay();
-        const widthRatio = options.widthRatio ?? 0.18;
-        const minWidth = options.minWidth ?? 72;
-        const maxWidth = options.maxWidth ?? 112;
-        const width = Math.min(Math.max(rect.width * widthRatio, minWidth), maxWidth);
-        const height = options.height ?? 48;
-        const bottomOffset = options.bottomOffset ?? 72;
-        const rightOffset = options.rightOffset ?? 24;
-        const leftOffset = options.leftOffset ?? 24;
-        const left =
-          options.align === "right"
-            ? rect.right - width - rightOffset
-            : options.align === "left"
-              ? rect.left + leftOffset
-              : rect.left + rect.width / 2 - width / 2;
-        const top = rect.bottom - height - bottomOffset;
-
-        target.style.left = `${left}px`;
-        target.style.top = `${top}px`;
-        target.style.width = `${width}px`;
-        target.style.height = `${height}px`;
-        return target;
-      },
-      cleanup() {
-        overlay?.remove();
-        overlay = null;
-      }
-    };
-  }
-
-  function getVideoTopLeftPanelPosition(video, panel, fallbackRect) {
+  function getVideoTopLeftPanelPosition(video, _panel, fallbackRect) {
     const rect = getVisibleVideoFrameRect(video, fallbackRect);
     if (!rect) {
-      return null;
+      return false;
     }
 
     const viewportPadding = 12;
@@ -259,10 +173,8 @@
   YRTC.video = {
     findActiveVideo,
     getVideoFrameRect,
-    findPlayerRect,
     isUsableVideo,
     getVideoRate,
-    createOverlayController,
     getVideoTopLeftPanelPosition
   };
 

@@ -40,27 +40,29 @@
     `;
   }
 
-  function positionPanel(target, panel, adapter) {
-    const panelPosition = adapter.getPanelPosition?.(target, panel);
+  function positionPanel(video, panel, adapter) {
+    const panelPosition = adapter.getPanelPosition?.(video, panel);
     if (panelPosition) {
       panel.style.left = `${panelPosition.left}px`;
       panel.style.top = `${panelPosition.top}px`;
       return;
     }
 
-    if (panelPosition === false) {
+    if (panelPosition === false || adapter.getPanelPosition) {
       hidePanel();
       return;
     }
 
-    const rect = adapter.getTriggerRect?.(target) || target.getBoundingClientRect();
-    const panelRect = panel.getBoundingClientRect();
+    const rect = video?.getBoundingClientRect();
+    if (!rect) {
+      hidePanel();
+      return;
+    }
+
     const viewportPadding = 12;
-    const left = Math.min(
-      Math.max(rect.left + rect.width / 2 - panelRect.width / 2, viewportPadding),
-      window.innerWidth - panelRect.width - viewportPadding
-    );
-    const top = Math.max(rect.top - panelRect.height - 10, viewportPadding);
+    const inset = 16;
+    const left = Math.max(rect.left + inset, viewportPadding);
+    const top = Math.max(rect.top + inset, viewportPadding);
 
     panel.style.left = `${left}px`;
     panel.style.top = `${top}px`;

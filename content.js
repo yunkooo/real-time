@@ -8,25 +8,18 @@
   } = YRTC.constants;
   const {
     createGenericAdapter,
-    createInflearnAdapter,
-    createUdemyAdapter,
-    createVimeoAdapter,
-    createYouTubeAdapter
+    createVimeoAdapter
   } = YRTC.adapters;
-  const { isPanelVisible, ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = YRTC.panel;
+  const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = YRTC.panel;
   const { getVideoRate, isUsableVideo } = YRTC.video;
 
   let enabled = true;
   let updateTimer = null;
   let mutationObserver = null;
   let currentVideo = null;
-  let triggerElement = null;
   let lastKnownRate = 1;
   let lastRateChangedAt = 0;
-  let lastPointerX = null;
-  let lastPointerY = null;
   let pendingUpdateFrame = null;
-  let removeTriggerListeners = null;
   let removeVideoListeners = null;
 
   function readSetting() {
@@ -79,43 +72,12 @@
     };
   }
 
-  function updatePointerPosition(event) {
-    lastPointerX = event.clientX;
-    lastPointerY = event.clientY;
-  }
-
-  function isPointerOverTrigger(trigger, adapter) {
-    if (!trigger?.isConnected || lastPointerX === null || lastPointerY === null) {
-      return false;
-    }
-
-    const rect = adapter.getTriggerRect?.(trigger) || trigger.getBoundingClientRect();
-    if (!rect) {
-      return false;
-    }
-
-    return (
-      lastPointerX >= rect.left &&
-      lastPointerX <= rect.right &&
-      lastPointerY >= rect.top &&
-      lastPointerY <= rect.bottom
-    );
-  }
-
-  function showPanel(adapter) {
-    cleanupDisconnectedRefs();
-
-    if (
-      !enabled ||
-      !triggerElement?.isConnected ||
-      !adapter.areControlsVisible(triggerElement) ||
-      !isPointerOverTrigger(triggerElement, adapter)
-    ) {
-      hidePanel();
+  function showPanel(video, adapter) {
+    if (!enabled) {
+      removeUi(adapter);
       return;
     }
 
-    const video = adapter.findVideo();
     const model = getTimeModel(video, adapter);
     if (!model) {
       hidePanel();
@@ -125,38 +87,7 @@
     const panel = ensurePanel();
     setPanelContent(panel, model);
     panel.classList.add("yrtc-panel-visible");
-    positionPanel(triggerElement, panel, adapter);
-  }
-
-  function bindTrigger(target, adapter) {
-    if (triggerElement === target) {
-      return;
-    }
-
-    removeTriggerListeners?.();
-    triggerElement = target;
-    triggerElement.classList.add("yrtc-time-trigger");
-
-    const handleMouseEnter = (event) => {
-      updatePointerPosition(event);
-      if (isPointerOverTrigger(target, adapter)) {
-        showPanel(adapter);
-      }
-    };
-    const handleMouseLeave = () => hidePanel();
-
-    triggerElement.addEventListener("mouseenter", handleMouseEnter);
-    triggerElement.addEventListener("mouseleave", handleMouseLeave);
-
-    removeTriggerListeners = () => {
-      target.classList.remove("yrtc-time-trigger");
-      target.removeEventListener("mouseenter", handleMouseEnter);
-      target.removeEventListener("mouseleave", handleMouseLeave);
-      removeTriggerListeners = null;
-      if (triggerElement === target) {
-        triggerElement = null;
-      }
-    };
+    positionPanel(video, panel, adapter);
   }
 
   function bindVideo(video, adapter) {
@@ -166,6 +97,8 @@
 
     removeVideoListeners?.();
     currentVideo = video;
+    lastKnownRate = 1;
+    lastRateChangedAt = 0;
 
     if (!video) {
       removeVideoListeners = null;
@@ -173,11 +106,7 @@
     }
 
     const boundVideo = video;
-    const handleVideoUpdate = () => {
-      if (isPanelVisible()) {
-        showPanel(adapter);
-      }
-    };
+    const handleVideoUpdate = () => showPanel(boundVideo, adapter);
 
     boundVideo.addEventListener("ratechange", handleVideoUpdate);
     boundVideo.addEventListener("timeupdate", handleVideoUpdate);
@@ -195,16 +124,12 @@
   }
 
   function cleanupDisconnectedRefs() {
-    if (triggerElement && !triggerElement.isConnected) {
-      removeTriggerListeners?.();
-    }
     if (currentVideo && !currentVideo.isConnected) {
       removeVideoListeners?.();
     }
   }
 
   function removeUi(adapter) {
-    removeTriggerListeners?.();
     removeVideoListeners?.();
     removePanel();
     adapter.cleanup?.();
@@ -219,25 +144,14 @@
     cleanupDisconnectedRefs();
 
     const video = adapter.findVideo();
-    const target = adapter.findTrigger(video);
-
-    if (!target || !getTimeModel(video, adapter)) {
-      removeUi(adapter);
-      return;
-    }
-
-    if (!adapter.areControlsVisible(target)) {
+    if (!video || !getTimeModel(video, adapter)) {
       hidePanel();
+      removeVideoListeners?.();
       return;
     }
 
-    bindTrigger(target, adapter);
     bindVideo(video, adapter);
-    adapter.afterUpdate?.(target, video);
-
-    if (isPointerOverTrigger(target, adapter) || isPanelVisible()) {
-      showPanel(adapter);
-    }
+    showPanel(video, adapter);
   }
 
   function startUpdating(adapter) {
@@ -300,46 +214,15 @@
   }
 
   function bindGlobalEvents(adapter) {
-    window.addEventListener(
-      "mousemove",
-      (event) => {
-        if (!enabled) {
-          return;
-        }
-
-        updatePointerPosition(event);
-
-        if (triggerElement && !isPanelVisible() && isPointerOverTrigger(triggerElement, adapter)) {
-          showPanel(adapter);
-        } else if (triggerElement && isPanelVisible() && !isPointerOverTrigger(triggerElement, adapter)) {
-          hidePanel();
-        }
-      },
-      { passive: true }
-    );
-
     window.addEventListener("resize", () => {
-      const panel = document.getElementById(YRTC.constants.PANEL_ID);
-      if (panel?.classList.contains("yrtc-panel-visible") && triggerElement) {
-        positionPanel(triggerElement, panel, adapter);
+      if (currentVideo?.isConnected) {
+        updateUi(adapter);
       }
     });
   }
 
   function createAdapter() {
     const host = window.location.hostname;
-    if (host === "www.youtube.com" || host === "youtube.com" || host.endsWith(".youtube.com")) {
-      return createYouTubeAdapter();
-    }
-
-    if (host === "udemy.com" || host.endsWith(".udemy.com")) {
-      return createUdemyAdapter();
-    }
-
-    if (host === "inflearn.com" || host.endsWith(".inflearn.com")) {
-      return createInflearnAdapter();
-    }
-
     if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
       return createVimeoAdapter();
     }

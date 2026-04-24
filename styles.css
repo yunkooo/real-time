@@ -1,15 +1,3 @@
-.yrtc-time-trigger {
-  cursor: default;
-}
-
-.yrtc-video-trigger {
-  background: transparent;
-  cursor: default;
-  pointer-events: none;
-  position: fixed;
-  z-index: 2147483646;
-}
-
 .yrtc-panel {
   background: rgba(28, 28, 28, 0.84);
   border-radius: 8px;
