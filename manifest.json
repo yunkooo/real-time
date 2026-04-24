@@ -15,7 +15,9 @@
         "https://vimeo.com/*",
         "https://player.vimeo.com/*",
         "https://udemy.com/*",
-        "https://*.udemy.com/*"
+        "https://*.udemy.com/*",
+        "https://inflearn.com/*",
+        "https://*.inflearn.com/*"
       ],
       "js": [
         "content-utils.js",
@@ -23,6 +25,7 @@
         "adapters/youtube.js",
         "adapters/vimeo.js",
         "adapters/udemy.js",
+        "adapters/inflearn.js",
         "adapters/generic.js",
         "content.js"
       ],

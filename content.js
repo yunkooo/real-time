@@ -6,7 +6,13 @@
     STORAGE_KEY,
     UPDATE_INTERVAL_MS
   } = YRTC.constants;
-  const { createGenericAdapter, createUdemyAdapter, createVimeoAdapter, createYouTubeAdapter } = YRTC.adapters;
+  const {
+    createGenericAdapter,
+    createInflearnAdapter,
+    createUdemyAdapter,
+    createVimeoAdapter,
+    createYouTubeAdapter
+  } = YRTC.adapters;
   const { isPanelVisible, ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = YRTC.panel;
   const { getVideoRate, isUsableVideo } = YRTC.video;
 
@@ -328,6 +334,10 @@
 
     if (host === "udemy.com" || host.endsWith(".udemy.com")) {
       return createUdemyAdapter();
+    }
+
+    if (host === "inflearn.com" || host.endsWith(".inflearn.com")) {
+      return createInflearnAdapter();
     }
 
     if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
