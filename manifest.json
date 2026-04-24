@@ -13,13 +13,16 @@
       "matches": [
         "https://www.youtube.com/*",
         "https://vimeo.com/*",
-        "https://player.vimeo.com/*"
+        "https://player.vimeo.com/*",
+        "https://udemy.com/*",
+        "https://*.udemy.com/*"
       ],
       "js": [
         "content-utils.js",
         "content-panel.js",
         "adapters/youtube.js",
         "adapters/vimeo.js",
+        "adapters/udemy.js",
         "adapters/generic.js",
         "content.js"
       ],
