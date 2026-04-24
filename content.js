@@ -1,15 +1,19 @@
 (() => {
   const STORAGE_KEY = "enabled";
-  const UI_ID = "yrtc-pill";
   const PANEL_ID = "yrtc-panel";
   const DEFAULT_STATE = { [STORAGE_KEY]: true };
   const UPDATE_INTERVAL_MS = 500;
+  const RATE_CACHE_GRACE_MS = 900;
 
   let enabled = true;
   let updateTimer = null;
   let mutationObserver = null;
   let currentVideo = null;
-  let isPanelPinned = false;
+  let triggerElement = null;
+  let lastKnownRate = 1;
+  let lastRateChangedAt = 0;
+  let removeTriggerListeners = null;
+  let removeVideoListeners = null;
 
   function readSetting() {
     return chrome.storage.sync
@@ -56,11 +60,57 @@
     );
   }
 
-  function findMountTarget() {
-    return (
-      document.querySelector(".ytp-left-controls .ytp-time-display") ||
-      document.querySelector(".ytp-left-controls")
-    );
+  function findTimeDisplay() {
+    return document.querySelector(".ytp-left-controls .ytp-time-display");
+  }
+
+  function findYouTubePlayer() {
+    return document.querySelector(".html5-video-player");
+  }
+
+  function arePlayerControlsVisible() {
+    const player = findYouTubePlayer();
+    return !!player && !player.classList.contains("ytp-autohide");
+  }
+
+  function getYouTubePlayerRate() {
+    const player = findYouTubePlayer();
+    if (!player || typeof player.getPlaybackRate !== "function") {
+      return null;
+    }
+
+    const rate = Number(player.getPlaybackRate());
+    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  }
+
+  function getVideoRate(video) {
+    const rate = Number(video?.playbackRate);
+    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  }
+
+  function getPlaybackRate(video) {
+    const playerRate = getYouTubePlayerRate();
+    const videoRate = getVideoRate(video);
+    const nextRate = playerRate || videoRate;
+
+    if (!nextRate) {
+      return lastKnownRate;
+    }
+
+    const now = Date.now();
+    const isLikelyTransientReset =
+      nextRate === 1 && lastKnownRate !== 1 && now - lastRateChangedAt < RATE_CACHE_GRACE_MS;
+
+    if (isLikelyTransientReset) {
+      return lastKnownRate;
+    }
+
+    if (nextRate !== lastKnownRate) {
+      lastKnownRate = nextRate;
+      lastRateChangedAt = now;
+    }
+
+    return nextRate;
   }
 
   function getTimeModel(video) {
@@ -68,43 +118,13 @@
       return null;
     }
 
-    const rate = Number.isFinite(video.playbackRate) && video.playbackRate > 0 ? video.playbackRate : 1;
+    const rate = getPlaybackRate(video);
     const remaining = Math.max(video.duration - video.currentTime, 0);
 
     return {
       rate,
-      realCurrent: video.currentTime / rate,
-      realDuration: video.duration / rate,
-      realRemaining: remaining / rate,
-      sourceDuration: video.duration
+      realRemaining: remaining / rate
     };
-  }
-
-  function createPill() {
-    const pill = document.createElement("button");
-    pill.id = UI_ID;
-    pill.className = "yrtc-pill";
-    pill.type = "button";
-    pill.setAttribute("aria-expanded", "false");
-    pill.setAttribute("aria-label", "배속 기준 남은 시간");
-
-    pill.addEventListener("mouseenter", showPanel);
-    pill.addEventListener("mouseleave", () => {
-      if (!isPanelPinned) {
-        hidePanel();
-      }
-    });
-    pill.addEventListener("click", (event) => {
-      event.stopPropagation();
-      isPanelPinned = !isPanelPinned;
-      if (isPanelPinned) {
-        showPanel();
-      } else {
-        hidePanel();
-      }
-    });
-
-    return pill;
   }
 
   function createPanel() {
@@ -112,31 +132,7 @@
     panel.id = PANEL_ID;
     panel.className = "yrtc-panel";
     panel.setAttribute("role", "tooltip");
-
-    panel.addEventListener("mouseenter", showPanel);
-    panel.addEventListener("mouseleave", () => {
-      if (!isPanelPinned) {
-        hidePanel();
-      }
-    });
-
     return panel;
-  }
-
-  function ensureUi() {
-    const existing = document.getElementById(UI_ID);
-    if (existing) {
-      return existing;
-    }
-
-    const target = findMountTarget();
-    if (!target) {
-      return null;
-    }
-
-    const pill = createPill();
-    target.insertAdjacentElement("afterend", pill);
-    return pill;
   }
 
   function ensurePanel() {
@@ -148,12 +144,12 @@
     return panel;
   }
 
-  function positionPanel(pill, panel) {
-    const rect = pill.getBoundingClientRect();
+  function positionPanel(target, panel) {
+    const rect = target.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
     const viewportPadding = 12;
     const left = Math.min(
-      Math.max(rect.left, viewportPadding),
+      Math.max(rect.left + rect.width / 2 - panelRect.width / 2, viewportPadding),
       window.innerWidth - panelRect.width - viewportPadding
     );
     const top = Math.max(rect.top - panelRect.height - 10, viewportPadding);
@@ -167,40 +163,97 @@
       <div class="yrtc-panel-title">배속 기준 시간</div>
       <div class="yrtc-row"><span>현재 배속</span><strong>${formatRate(model.rate)}</strong></div>
       <div class="yrtc-row"><span>현실 남은 시간</span><strong>${formatDuration(model.realRemaining)}</strong></div>
-      <div class="yrtc-row"><span>현실 전체 소요</span><strong>${formatDuration(model.realDuration)}</strong></div>
-      <div class="yrtc-row"><span>영상 원본 길이</span><strong>${formatDuration(model.sourceDuration)}</strong></div>
     `;
   }
 
   function showPanel() {
-    const pill = document.getElementById(UI_ID);
-    const model = getTimeModel(currentVideo || findActiveVideo());
-    if (!pill || !model) {
+    if (!enabled || !triggerElement || !arePlayerControlsVisible()) {
+      hidePanel();
+      return;
+    }
+
+    currentVideo = findActiveVideo();
+    const model = getTimeModel(currentVideo);
+    if (!model) {
+      hidePanel();
       return;
     }
 
     const panel = ensurePanel();
     setPanelContent(panel, model);
     panel.classList.add("yrtc-panel-visible");
-    pill.setAttribute("aria-expanded", "true");
-    positionPanel(pill, panel);
+    positionPanel(triggerElement, panel);
   }
 
   function hidePanel() {
-    const panel = document.getElementById(PANEL_ID);
-    const pill = document.getElementById(UI_ID);
-    if (panel) {
-      panel.classList.remove("yrtc-panel-visible");
+    document.getElementById(PANEL_ID)?.classList.remove("yrtc-panel-visible");
+  }
+
+  function removePanel() {
+    document.getElementById(PANEL_ID)?.remove();
+  }
+
+  function bindTrigger(target) {
+    if (triggerElement === target) {
+      return;
     }
-    if (pill) {
-      pill.setAttribute("aria-expanded", "false");
+
+    removeTriggerListeners?.();
+    triggerElement = target;
+    triggerElement.classList.add("yrtc-time-trigger");
+
+    const handleMouseEnter = () => showPanel();
+    const handleMouseLeave = () => hidePanel();
+
+    triggerElement.addEventListener("mouseenter", handleMouseEnter);
+    triggerElement.addEventListener("mouseleave", handleMouseLeave);
+
+    removeTriggerListeners = () => {
+      target.classList.remove("yrtc-time-trigger");
+      target.removeEventListener("mouseenter", handleMouseEnter);
+      target.removeEventListener("mouseleave", handleMouseLeave);
+      removeTriggerListeners = null;
+      if (triggerElement === target) {
+        triggerElement = null;
+      }
+    };
+  }
+
+  function bindVideo(video) {
+    if (currentVideo === video && removeVideoListeners) {
+      return;
     }
+
+    removeVideoListeners?.();
+    currentVideo = video;
+
+    if (!video) {
+      removeVideoListeners = null;
+      return;
+    }
+
+    const handleVideoUpdate = () => {
+      if (document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible")) {
+        showPanel();
+      }
+    };
+
+    video.addEventListener("ratechange", handleVideoUpdate);
+    video.addEventListener("timeupdate", handleVideoUpdate);
+    video.addEventListener("loadedmetadata", handleVideoUpdate);
+
+    removeVideoListeners = () => {
+      video.removeEventListener("ratechange", handleVideoUpdate);
+      video.removeEventListener("timeupdate", handleVideoUpdate);
+      video.removeEventListener("loadedmetadata", handleVideoUpdate);
+      removeVideoListeners = null;
+    };
   }
 
   function removeUi() {
-    document.getElementById(UI_ID)?.remove();
-    document.getElementById(PANEL_ID)?.remove();
-    isPanelPinned = false;
+    removeTriggerListeners?.();
+    removeVideoListeners?.();
+    removePanel();
   }
 
   function updateUi() {
@@ -209,25 +262,24 @@
       return;
     }
 
-    currentVideo = findActiveVideo();
-    const model = getTimeModel(currentVideo);
-    if (!model) {
+    if (!arePlayerControlsVisible()) {
+      hidePanel();
+      return;
+    }
+
+    const target = findTimeDisplay();
+    const video = findActiveVideo();
+
+    if (!target || !getTimeModel(video)) {
       removeUi();
       return;
     }
 
-    const pill = ensureUi();
-    if (!pill) {
-      return;
-    }
+    bindTrigger(target);
+    bindVideo(video);
 
-    pill.textContent = `${formatRate(model.rate)} · ${formatDuration(model.realRemaining)} 남음`;
-    pill.title = `현재 배속 기준으로 ${formatDuration(model.realRemaining)} 남았습니다.`;
-
-    const panel = document.getElementById(PANEL_ID);
-    if (panel?.classList.contains("yrtc-panel-visible")) {
-      setPanelContent(panel, model);
-      positionPanel(pill, panel);
+    if (document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible")) {
+      showPanel();
     }
   }
 
@@ -251,6 +303,8 @@
     });
 
     mutationObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
       childList: true,
       subtree: true
     });
@@ -275,22 +329,8 @@
   function bindGlobalEvents() {
     window.addEventListener("resize", () => {
       const panel = document.getElementById(PANEL_ID);
-      const pill = document.getElementById(UI_ID);
-      if (panel?.classList.contains("yrtc-panel-visible") && pill) {
-        positionPanel(pill, panel);
-      }
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!isPanelPinned) {
-        return;
-      }
-
-      const pill = document.getElementById(UI_ID);
-      const panel = document.getElementById(PANEL_ID);
-      if (!pill?.contains(event.target) && !panel?.contains(event.target)) {
-        isPanelPinned = false;
-        hidePanel();
+      if (panel?.classList.contains("yrtc-panel-visible") && triggerElement) {
+        positionPanel(triggerElement, panel);
       }
     });
   }

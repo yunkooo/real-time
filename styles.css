@@ -1,46 +1,18 @@
-.yrtc-pill {
-  align-items: center;
-  background: rgba(0, 0, 0, 0.58);
-  border: 0;
-  border-radius: 999px;
-  color: #fff;
+.yrtc-time-trigger {
   cursor: default;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-family: "YouTube Noto", Roboto, Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  height: 32px;
-  line-height: 1;
-  margin-left: 8px;
-  max-width: 132px;
-  overflow: hidden;
-  padding: 0 12px;
-  position: relative;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-  white-space: nowrap;
-  z-index: 60;
-}
-
-.yrtc-pill:hover,
-.yrtc-pill:focus-visible,
-.yrtc-pill[aria-expanded="true"] {
-  background: rgba(0, 0, 0, 0.78);
-  outline: none;
 }
 
 .yrtc-panel {
   background: rgba(28, 28, 28, 0.96);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.38);
   color: #fff;
   font-family: "YouTube Noto", Roboto, Arial, Helvetica, sans-serif;
   font-size: 13px;
   left: 0;
-  min-width: 190px;
+  min-width: 170px;
   opacity: 0;
-  padding: 12px;
+  padding: 10px 12px;
   pointer-events: none;
   position: fixed;
   top: 0;
@@ -51,7 +23,6 @@
 
 .yrtc-panel-visible {
   opacity: 1;
-  pointer-events: auto;
   transform: translateY(0);
 }
 
@@ -59,7 +30,7 @@
   color: rgba(255, 255, 255, 0.72);
   font-size: 12px;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .yrtc-row {
