@@ -1,4 +1,4 @@
-# YouTube Real-Time Cost
+# Real-time left
 
 Chrome extension that shows how much real time is left on a YouTube video based on the current playback speed.
 
@@ -16,7 +16,7 @@ On YouTube, hover the default time display to see:
 3. Click `Load unpacked`.
 4. Select the cloned repository folder.
 
-The extension popup has one setting: `배속 기준 남은 시간 표시`.
+The extension popup has one setting: `Real-time left`.
 
 ## Project Structure
 
@@ -37,4 +37,4 @@ There is no build or automated test script yet. After changing the extension:
 4. Check that no extra pill appears near the default time display.
 5. Hover the default time display and confirm the detail panel opens.
 6. Change playback speed and confirm the remaining time updates.
-7. Toggle `배속 기준 남은 시간 표시` in the popup and confirm the YouTube UI updates.
+7. Toggle `Real-time left` in the popup and confirm the YouTube UI updates.

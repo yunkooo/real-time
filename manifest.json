@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Real-Time Cost",
+  "name": "Real-time left",
   "description": "Shows how much real time is left based on the current YouTube playback speed.",
   "version": "0.1.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "YouTube Real-Time Cost"
+    "default_title": "Real-time left"
   },
   "permissions": ["storage"],
   "content_scripts": [
