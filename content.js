@@ -12,6 +12,7 @@
   let triggerElement = null;
   let lastKnownRate = 1;
   let lastRateChangedAt = 0;
+  let pendingUpdateFrame = null;
   let removeTriggerListeners = null;
   let removeVideoListeners = null;
 
@@ -167,13 +168,15 @@
   }
 
   function showPanel() {
-    if (!enabled || !triggerElement || !arePlayerControlsVisible()) {
+    cleanupDisconnectedRefs();
+
+    if (!enabled || !triggerElement?.isConnected || !arePlayerControlsVisible()) {
       hidePanel();
       return;
     }
 
-    currentVideo = findActiveVideo();
-    const model = getTimeModel(currentVideo);
+    const video = findActiveVideo();
+    const model = getTimeModel(video);
     if (!model) {
       hidePanel();
       return;
@@ -232,22 +235,35 @@
       return;
     }
 
+    const boundVideo = video;
     const handleVideoUpdate = () => {
       if (document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible")) {
         showPanel();
       }
     };
 
-    video.addEventListener("ratechange", handleVideoUpdate);
-    video.addEventListener("timeupdate", handleVideoUpdate);
-    video.addEventListener("loadedmetadata", handleVideoUpdate);
+    boundVideo.addEventListener("ratechange", handleVideoUpdate);
+    boundVideo.addEventListener("timeupdate", handleVideoUpdate);
+    boundVideo.addEventListener("loadedmetadata", handleVideoUpdate);
 
     removeVideoListeners = () => {
-      video.removeEventListener("ratechange", handleVideoUpdate);
-      video.removeEventListener("timeupdate", handleVideoUpdate);
-      video.removeEventListener("loadedmetadata", handleVideoUpdate);
+      boundVideo.removeEventListener("ratechange", handleVideoUpdate);
+      boundVideo.removeEventListener("timeupdate", handleVideoUpdate);
+      boundVideo.removeEventListener("loadedmetadata", handleVideoUpdate);
       removeVideoListeners = null;
+      if (currentVideo === boundVideo) {
+        currentVideo = null;
+      }
     };
+  }
+
+  function cleanupDisconnectedRefs() {
+    if (triggerElement && !triggerElement.isConnected) {
+      removeTriggerListeners?.();
+    }
+    if (currentVideo && !currentVideo.isConnected) {
+      removeVideoListeners?.();
+    }
   }
 
   function removeUi() {
@@ -261,6 +277,8 @@
       removeUi();
       return;
     }
+
+    cleanupDisconnectedRefs();
 
     if (!arePlayerControlsVisible()) {
       hidePanel();
@@ -285,6 +303,7 @@
 
   function startUpdating() {
     stopUpdating();
+    observeYouTubeChanges();
     updateTimer = window.setInterval(updateUi, UPDATE_INTERVAL_MS);
     updateUi();
   }
@@ -294,13 +313,28 @@
       window.clearInterval(updateTimer);
       updateTimer = null;
     }
+    if (pendingUpdateFrame !== null) {
+      window.cancelAnimationFrame(pendingUpdateFrame);
+      pendingUpdateFrame = null;
+    }
+    mutationObserver?.disconnect();
+    mutationObserver = null;
+  }
+
+  function scheduleUpdate() {
+    if (pendingUpdateFrame !== null) {
+      return;
+    }
+
+    pendingUpdateFrame = window.requestAnimationFrame(() => {
+      pendingUpdateFrame = null;
+      updateUi();
+    });
   }
 
   function observeYouTubeChanges() {
     mutationObserver?.disconnect();
-    mutationObserver = new MutationObserver(() => {
-      window.requestAnimationFrame(updateUi);
-    });
+    mutationObserver = new MutationObserver(scheduleUpdate);
 
     mutationObserver.observe(document.documentElement, {
       attributes: true,
@@ -339,7 +373,6 @@
     await readSetting();
     bindStorageChanges();
     bindGlobalEvents();
-    observeYouTubeChanges();
 
     if (enabled) {
       startUpdating();
