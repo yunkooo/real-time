@@ -171,7 +171,7 @@
     }
 
     const viewportPadding = 1;
-    const sampleX = Math.min(Math.max(frameRect.right - 24, viewportPadding), window.innerWidth - viewportPadding);
+    const sampleX = Math.min(Math.max(frameRect.left + 24, viewportPadding), window.innerWidth - viewportPadding);
     const startY = Math.max(frameRect.top, 0);
     const endY = Math.min(frameRect.bottom, window.innerHeight);
 
@@ -237,19 +237,15 @@
     };
   }
 
-  function getVideoTopRightPanelPosition(video, panel, fallbackRect) {
+  function getVideoTopLeftPanelPosition(video, panel, fallbackRect) {
     const rect = getVisibleVideoFrameRect(video, fallbackRect);
     if (!rect) {
       return null;
     }
 
-    const panelRect = panel.getBoundingClientRect();
     const viewportPadding = 12;
     const inset = 16;
-    const left = Math.min(
-      Math.max(rect.right - panelRect.width - inset, viewportPadding),
-      window.innerWidth - panelRect.width - viewportPadding
-    );
+    const left = Math.max(rect.left + inset, viewportPadding);
     const top = Math.max(rect.top + inset, viewportPadding);
 
     return { left, top };
@@ -267,7 +263,7 @@
     isUsableVideo,
     getVideoRate,
     createOverlayController,
-    getVideoTopRightPanelPosition
+    getVideoTopLeftPanelPosition
   };
 
   YRTC.adapters = YRTC.adapters || {};

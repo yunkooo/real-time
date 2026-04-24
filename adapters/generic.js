@@ -1,7 +1,7 @@
 (() => {
   const YRTC = window.YRTC;
   const { OVERLAY_TRIGGER_ID } = YRTC.constants;
-  const { createOverlayController, findActiveVideo, getVideoRate, getVideoTopRightPanelPosition } = YRTC.video;
+  const { createOverlayController, findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = YRTC.video;
 
   function createGenericAdapter() {
     const overlay = createOverlayController(OVERLAY_TRIGGER_ID);
@@ -32,7 +32,7 @@
         return trigger?.getBoundingClientRect() || null;
       },
       getPanelPosition(_trigger, panel) {
-        return getVideoTopRightPanelPosition(findActiveVideo(), panel);
+        return getVideoTopLeftPanelPosition(findActiveVideo(), panel);
       },
       afterUpdate(target, video) {
         if (target.id === OVERLAY_TRIGGER_ID) {
