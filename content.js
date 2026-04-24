@@ -12,6 +12,8 @@
   let triggerElement = null;
   let lastKnownRate = 1;
   let lastRateChangedAt = 0;
+  let lastPointerX = null;
+  let lastPointerY = null;
   let pendingUpdateFrame = null;
   let removeTriggerListeners = null;
   let removeVideoListeners = null;
@@ -62,7 +64,7 @@
   }
 
   function findTimeDisplay() {
-    return document.querySelector(".ytp-left-controls .ytp-time-display");
+    return document.querySelector(".html5-video-player .ytp-left-controls .ytp-time-display");
   }
 
   function findYouTubePlayer() {
@@ -146,7 +148,7 @@
   }
 
   function positionPanel(target, panel) {
-    const rect = target.getBoundingClientRect();
+    const rect = getTimeHitboxRect(target) || target.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
     const viewportPadding = 12;
     const left = Math.min(
@@ -157,6 +159,53 @@
 
     panel.style.left = `${left}px`;
     panel.style.top = `${top}px`;
+  }
+
+  function updatePointerPosition(event) {
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
+  }
+
+  function getTimeHitboxRect(element) {
+    if (!element?.isConnected) {
+      return null;
+    }
+
+    const currentTime = element.querySelector(".ytp-time-current");
+    const duration = element.querySelector(".ytp-time-duration");
+    if (!currentTime || !duration) {
+      return element.getBoundingClientRect();
+    }
+
+    const currentRect = currentTime.getBoundingClientRect();
+    const durationRect = duration.getBoundingClientRect();
+
+    return {
+      left: Math.min(currentRect.left, durationRect.left),
+      right: Math.max(currentRect.right, durationRect.right),
+      top: Math.min(currentRect.top, durationRect.top),
+      bottom: Math.max(currentRect.bottom, durationRect.bottom),
+      width: Math.max(currentRect.right, durationRect.right) - Math.min(currentRect.left, durationRect.left),
+      height: Math.max(currentRect.bottom, durationRect.bottom) - Math.min(currentRect.top, durationRect.top)
+    };
+  }
+
+  function isPointerOverElement(element) {
+    if (!element?.isConnected || lastPointerX === null || lastPointerY === null) {
+      return false;
+    }
+
+    const rect = getTimeHitboxRect(element);
+    if (!rect) {
+      return false;
+    }
+
+    return (
+      lastPointerX >= rect.left &&
+      lastPointerX <= rect.right &&
+      lastPointerY >= rect.top &&
+      lastPointerY <= rect.bottom
+    );
   }
 
   function setPanelContent(panel, model) {
@@ -192,6 +241,10 @@
     document.getElementById(PANEL_ID)?.classList.remove("yrtc-panel-visible");
   }
 
+  function isPanelVisible() {
+    return document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible") === true;
+  }
+
   function removePanel() {
     document.getElementById(PANEL_ID)?.remove();
   }
@@ -205,7 +258,12 @@
     triggerElement = target;
     triggerElement.classList.add("yrtc-time-trigger");
 
-    const handleMouseEnter = () => showPanel();
+    const handleMouseEnter = (event) => {
+      updatePointerPosition(event);
+      if (isPointerOverElement(target)) {
+        showPanel();
+      }
+    };
     const handleMouseLeave = () => hidePanel();
 
     triggerElement.addEventListener("mouseenter", handleMouseEnter);
@@ -296,7 +354,7 @@
     bindTrigger(target);
     bindVideo(video);
 
-    if (document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible")) {
+    if (isPointerOverElement(target) || isPanelVisible()) {
       showPanel();
     }
   }
@@ -361,6 +419,24 @@
   }
 
   function bindGlobalEvents() {
+    window.addEventListener(
+      "mousemove",
+      (event) => {
+        if (!enabled) {
+          return;
+        }
+
+        updatePointerPosition(event);
+
+        if (triggerElement && !isPanelVisible() && isPointerOverElement(triggerElement)) {
+          showPanel();
+        } else if (triggerElement && isPanelVisible() && !isPointerOverElement(triggerElement)) {
+          hidePanel();
+        }
+      },
+      { passive: true }
+    );
+
     window.addEventListener("resize", () => {
       const panel = document.getElementById(PANEL_ID);
       if (panel?.classList.contains("yrtc-panel-visible") && triggerElement) {
