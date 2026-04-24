@@ -22,7 +22,7 @@ Hover or click the pill to see:
 1. Open `chrome://extensions`.
 2. Turn on Developer mode.
 3. Click `Load unpacked`.
-4. Select this folder: `/Users/koo/Desktop/dev/vedioSpeedTime`.
+4. Select the cloned repository folder.
 
 The extension popup has one setting: `배속 기준 남은 시간 표시`.
 
