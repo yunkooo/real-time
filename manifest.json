@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Real-time",
-  "description": "Shows real remaining time based on the current YouTube playback speed.",
+  "description": "Shows real remaining time based on the current video playback speed.",
   "version": "0.1.0",
   "action": {
     "default_popup": "popup.html",
@@ -10,9 +10,14 @@
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://vimeo.com/*",
+        "https://player.vimeo.com/*"
+      ],
       "js": ["content.js"],
       "css": ["styles.css"],
+      "all_frames": true,
       "run_at": "document_idle"
     }
   ]

@@ -2,17 +2,25 @@
   cursor: default;
 }
 
+.yrtc-vimeo-trigger {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+  position: fixed;
+  z-index: 2147483646;
+}
+
 .yrtc-panel {
   background: rgba(28, 28, 28, 0.96);
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.38);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.36);
   color: #fff;
   font-family: "YouTube Noto", Roboto, Arial, Helvetica, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   left: 0;
-  min-width: 150px;
+  min-width: 0;
   opacity: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   pointer-events: none;
   position: fixed;
   top: 0;
@@ -28,17 +36,18 @@
 
 .yrtc-panel-title {
   color: rgba(255, 255, 255, 0.72);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .yrtc-row {
   align-items: center;
-  display: flex;
-  gap: 18px;
-  justify-content: space-between;
-  min-height: 24px;
+  column-gap: 14px;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  min-height: 20px;
 }
 
 .yrtc-row span {
@@ -48,6 +57,7 @@
 
 .yrtc-row strong {
   color: #fff;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }

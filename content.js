@@ -1,6 +1,7 @@
 (() => {
   const STORAGE_KEY = "enabled";
   const PANEL_ID = "yrtc-panel";
+  const VIMEO_TRIGGER_ID = "yrtc-vimeo-trigger";
   const DEFAULT_STATE = { [STORAGE_KEY]: true };
   const UPDATE_INTERVAL_MS = 500;
   const RATE_CACHE_GRACE_MS = 900;
@@ -63,27 +64,8 @@
     );
   }
 
-  function findTimeDisplay() {
-    return document.querySelector(".html5-video-player .ytp-left-controls .ytp-time-display");
-  }
-
-  function findYouTubePlayer() {
-    return document.querySelector(".html5-video-player");
-  }
-
-  function arePlayerControlsVisible() {
-    const player = findYouTubePlayer();
-    return !!player && !player.classList.contains("ytp-autohide");
-  }
-
-  function getYouTubePlayerRate() {
-    const player = findYouTubePlayer();
-    if (!player || typeof player.getPlaybackRate !== "function") {
-      return null;
-    }
-
-    const rate = Number(player.getPlaybackRate());
-    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  function isUsableVideo(video) {
+    return !!video && Number.isFinite(video.duration) && video.duration > 0 && Number.isFinite(video.currentTime);
   }
 
   function getVideoRate(video) {
@@ -91,10 +73,10 @@
     return Number.isFinite(rate) && rate > 0 ? rate : null;
   }
 
-  function getPlaybackRate(video) {
-    const playerRate = getYouTubePlayerRate();
+  function getPlaybackRate(video, adapter) {
+    const adapterRate = adapter.getPlaybackRate?.(video) || null;
     const videoRate = getVideoRate(video);
-    const nextRate = playerRate || videoRate;
+    const nextRate = adapterRate || videoRate;
 
     if (!nextRate) {
       return lastKnownRate;
@@ -116,12 +98,12 @@
     return nextRate;
   }
 
-  function getTimeModel(video) {
-    if (!video || !Number.isFinite(video.duration) || video.duration <= 0 || !Number.isFinite(video.currentTime)) {
+  function getTimeModel(video, adapter) {
+    if (!isUsableVideo(video)) {
       return null;
     }
 
-    const rate = getPlaybackRate(video);
+    const rate = getPlaybackRate(video, adapter);
     const remaining = Math.max(video.duration - video.currentTime, 0);
 
     return {
@@ -147,8 +129,15 @@
     return panel;
   }
 
-  function positionPanel(target, panel) {
-    const rect = getTimeHitboxRect(target) || target.getBoundingClientRect();
+  function positionPanel(target, panel, adapter) {
+    const panelPosition = adapter.getPanelPosition?.(target, panel);
+    if (panelPosition) {
+      panel.style.left = `${panelPosition.left}px`;
+      panel.style.top = `${panelPosition.top}px`;
+      return;
+    }
+
+    const rect = adapter.getTriggerRect?.(target) || target.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
     const viewportPadding = 12;
     const left = Math.min(
@@ -166,36 +155,12 @@
     lastPointerY = event.clientY;
   }
 
-  function getTimeHitboxRect(element) {
-    if (!element?.isConnected) {
-      return null;
-    }
-
-    const currentTime = element.querySelector(".ytp-time-current");
-    const duration = element.querySelector(".ytp-time-duration");
-    if (!currentTime || !duration) {
-      return element.getBoundingClientRect();
-    }
-
-    const currentRect = currentTime.getBoundingClientRect();
-    const durationRect = duration.getBoundingClientRect();
-
-    return {
-      left: Math.min(currentRect.left, durationRect.left),
-      right: Math.max(currentRect.right, durationRect.right),
-      top: Math.min(currentRect.top, durationRect.top),
-      bottom: Math.max(currentRect.bottom, durationRect.bottom),
-      width: Math.max(currentRect.right, durationRect.right) - Math.min(currentRect.left, durationRect.left),
-      height: Math.max(currentRect.bottom, durationRect.bottom) - Math.min(currentRect.top, durationRect.top)
-    };
-  }
-
-  function isPointerOverElement(element) {
-    if (!element?.isConnected || lastPointerX === null || lastPointerY === null) {
+  function isPointerOverTrigger(trigger, adapter) {
+    if (!trigger?.isConnected || lastPointerX === null || lastPointerY === null) {
       return false;
     }
 
-    const rect = getTimeHitboxRect(element);
+    const rect = adapter.getTriggerRect?.(trigger) || trigger.getBoundingClientRect();
     if (!rect) {
       return false;
     }
@@ -216,16 +181,21 @@
     `;
   }
 
-  function showPanel() {
+  function showPanel(adapter) {
     cleanupDisconnectedRefs();
 
-    if (!enabled || !triggerElement?.isConnected || !arePlayerControlsVisible()) {
+    if (
+      !enabled ||
+      !triggerElement?.isConnected ||
+      !adapter.areControlsVisible(triggerElement) ||
+      !isPointerOverTrigger(triggerElement, adapter)
+    ) {
       hidePanel();
       return;
     }
 
-    const video = findActiveVideo();
-    const model = getTimeModel(video);
+    const video = adapter.findVideo();
+    const model = getTimeModel(video, adapter);
     if (!model) {
       hidePanel();
       return;
@@ -234,7 +204,7 @@
     const panel = ensurePanel();
     setPanelContent(panel, model);
     panel.classList.add("yrtc-panel-visible");
-    positionPanel(triggerElement, panel);
+    positionPanel(triggerElement, panel, adapter);
   }
 
   function hidePanel() {
@@ -249,7 +219,7 @@
     document.getElementById(PANEL_ID)?.remove();
   }
 
-  function bindTrigger(target) {
+  function bindTrigger(target, adapter) {
     if (triggerElement === target) {
       return;
     }
@@ -260,8 +230,8 @@
 
     const handleMouseEnter = (event) => {
       updatePointerPosition(event);
-      if (isPointerOverElement(target)) {
-        showPanel();
+      if (isPointerOverTrigger(target, adapter)) {
+        showPanel(adapter);
       }
     };
     const handleMouseLeave = () => hidePanel();
@@ -280,7 +250,7 @@
     };
   }
 
-  function bindVideo(video) {
+  function bindVideo(video, adapter) {
     if (currentVideo === video && removeVideoListeners) {
       return;
     }
@@ -295,8 +265,8 @@
 
     const boundVideo = video;
     const handleVideoUpdate = () => {
-      if (document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible")) {
-        showPanel();
+      if (isPanelVisible()) {
+        showPanel(adapter);
       }
     };
 
@@ -324,46 +294,48 @@
     }
   }
 
-  function removeUi() {
+  function removeUi(adapter) {
     removeTriggerListeners?.();
     removeVideoListeners?.();
     removePanel();
+    adapter.cleanup?.();
   }
 
-  function updateUi() {
+  function updateUi(adapter) {
     if (!enabled) {
-      removeUi();
+      removeUi(adapter);
       return;
     }
 
     cleanupDisconnectedRefs();
 
-    if (!arePlayerControlsVisible()) {
+    const video = adapter.findVideo();
+    const target = adapter.findTrigger(video);
+
+    if (!target || !getTimeModel(video, adapter)) {
+      removeUi(adapter);
+      return;
+    }
+
+    if (!adapter.areControlsVisible(target)) {
       hidePanel();
       return;
     }
 
-    const target = findTimeDisplay();
-    const video = findActiveVideo();
+    bindTrigger(target, adapter);
+    bindVideo(video, adapter);
+    adapter.afterUpdate?.(target, video);
 
-    if (!target || !getTimeModel(video)) {
-      removeUi();
-      return;
-    }
-
-    bindTrigger(target);
-    bindVideo(video);
-
-    if (isPointerOverElement(target) || isPanelVisible()) {
-      showPanel();
+    if (isPointerOverTrigger(target, adapter) || isPanelVisible()) {
+      showPanel(adapter);
     }
   }
 
-  function startUpdating() {
+  function startUpdating(adapter) {
     stopUpdating();
-    observeYouTubeChanges();
-    updateTimer = window.setInterval(updateUi, UPDATE_INTERVAL_MS);
-    updateUi();
+    observePageChanges(adapter);
+    updateTimer = window.setInterval(() => updateUi(adapter), UPDATE_INTERVAL_MS);
+    updateUi(adapter);
   }
 
   function stopUpdating() {
@@ -379,30 +351,30 @@
     mutationObserver = null;
   }
 
-  function scheduleUpdate() {
+  function scheduleUpdate(adapter) {
     if (pendingUpdateFrame !== null) {
       return;
     }
 
     pendingUpdateFrame = window.requestAnimationFrame(() => {
       pendingUpdateFrame = null;
-      updateUi();
+      updateUi(adapter);
     });
   }
 
-  function observeYouTubeChanges() {
+  function observePageChanges(adapter) {
     mutationObserver?.disconnect();
-    mutationObserver = new MutationObserver(scheduleUpdate);
+    mutationObserver = new MutationObserver(() => scheduleUpdate(adapter));
 
     mutationObserver.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class"],
+      attributeFilter: ["class", "style"],
       childList: true,
       subtree: true
     });
   }
 
-  function bindStorageChanges() {
+  function bindStorageChanges(adapter) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName !== "sync" || !Object.prototype.hasOwnProperty.call(changes, STORAGE_KEY)) {
         return;
@@ -410,15 +382,15 @@
 
       enabled = changes[STORAGE_KEY].newValue !== false;
       if (enabled) {
-        startUpdating();
+        startUpdating(adapter);
       } else {
         stopUpdating();
-        removeUi();
+        removeUi(adapter);
       }
     });
   }
 
-  function bindGlobalEvents() {
+  function bindGlobalEvents(adapter) {
     window.addEventListener(
       "mousemove",
       (event) => {
@@ -428,9 +400,9 @@
 
         updatePointerPosition(event);
 
-        if (triggerElement && !isPanelVisible() && isPointerOverElement(triggerElement)) {
-          showPanel();
-        } else if (triggerElement && isPanelVisible() && !isPointerOverElement(triggerElement)) {
+        if (triggerElement && !isPanelVisible() && isPointerOverTrigger(triggerElement, adapter)) {
+          showPanel(adapter);
+        } else if (triggerElement && isPanelVisible() && !isPointerOverTrigger(triggerElement, adapter)) {
           hidePanel();
         }
       },
@@ -440,18 +412,141 @@
     window.addEventListener("resize", () => {
       const panel = document.getElementById(PANEL_ID);
       if (panel?.classList.contains("yrtc-panel-visible") && triggerElement) {
-        positionPanel(triggerElement, panel);
+        positionPanel(triggerElement, panel, adapter);
       }
     });
   }
 
+  function createYouTubeAdapter() {
+    return {
+      findVideo: findActiveVideo,
+      findTrigger() {
+        return document.querySelector(".html5-video-player .ytp-left-controls .ytp-time-display");
+      },
+      areControlsVisible() {
+        const player = document.querySelector(".html5-video-player");
+        return !!player && !player.classList.contains("ytp-autohide");
+      },
+      getPlaybackRate(video) {
+        const player = document.querySelector(".html5-video-player");
+        if (!player || typeof player.getPlaybackRate !== "function") {
+          return getVideoRate(video);
+        }
+
+        const rate = Number(player.getPlaybackRate());
+        return Number.isFinite(rate) && rate > 0 ? rate : getVideoRate(video);
+      },
+      getTriggerRect(trigger) {
+        return trigger?.querySelector(".ytp-time-wrapper")?.getBoundingClientRect() || trigger?.getBoundingClientRect() || null;
+      }
+    };
+  }
+
+  function createVimeoAdapter() {
+    let overlay = null;
+
+    function ensureOverlay() {
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = VIMEO_TRIGGER_ID;
+        overlay.className = "yrtc-vimeo-trigger";
+        overlay.setAttribute("aria-label", "Real-time video duration");
+        document.body.appendChild(overlay);
+      }
+      return overlay;
+    }
+
+    function positionOverlay(video) {
+      if (!video?.isConnected) {
+        return null;
+      }
+
+      const rect = video.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        return null;
+      }
+
+      const target = ensureOverlay();
+
+      const width = Math.min(Math.max(rect.width * 0.18, 64), 96);
+      const height = 44;
+      const left = rect.left + rect.width / 2 - width / 2;
+      const top = rect.bottom - height - 58;
+
+      target.style.left = `${left}px`;
+      target.style.top = `${top}px`;
+      target.style.width = `${width}px`;
+      target.style.height = `${height}px`;
+      return target;
+    }
+
+    return {
+      findVideo: findActiveVideo,
+      findTrigger(video) {
+        return positionOverlay(video);
+      },
+      areControlsVisible(trigger) {
+        return document.visibilityState === "visible" && !!trigger?.isConnected;
+      },
+      getPlaybackRate: getVideoRate,
+      getTriggerRect(trigger) {
+        return trigger?.getBoundingClientRect() || null;
+      },
+      getPanelPosition(trigger, panel) {
+        const triggerRect = trigger?.getBoundingClientRect();
+        if (!triggerRect) {
+          return null;
+        }
+
+        const panelRect = panel.getBoundingClientRect();
+        const viewportPadding = 12;
+        const belowProgressOffset = 20;
+        const left = Math.min(
+          Math.max(triggerRect.left + triggerRect.width / 2 - panelRect.width / 2, viewportPadding),
+          window.innerWidth - panelRect.width - viewportPadding
+        );
+        const top = Math.min(
+          Math.max(triggerRect.bottom + belowProgressOffset, viewportPadding),
+          window.innerHeight - panelRect.height - viewportPadding
+        );
+
+        return { left, top };
+      },
+      afterUpdate(target, video) {
+        positionOverlay(video);
+      },
+      cleanup() {
+        overlay?.remove();
+        overlay = null;
+      }
+    };
+  }
+
+  function createAdapter() {
+    const host = window.location.hostname;
+    if (host === "www.youtube.com" || host === "youtube.com" || host.endsWith(".youtube.com")) {
+      return createYouTubeAdapter();
+    }
+
+    if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
+      return createVimeoAdapter();
+    }
+
+    return null;
+  }
+
   async function init() {
+    const adapter = createAdapter();
+    if (!adapter) {
+      return;
+    }
+
     await readSetting();
-    bindStorageChanges();
-    bindGlobalEvents();
+    bindStorageChanges(adapter);
+    bindGlobalEvents(adapter);
 
     if (enabled) {
-      startUpdating();
+      startUpdating(adapter);
     }
   }
 
