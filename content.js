@@ -137,6 +137,11 @@
       return;
     }
 
+    if (panelPosition === false) {
+      hidePanel();
+      return;
+    }
+
     const rect = adapter.getTriggerRect?.(target) || target.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
     const viewportPadding = 12;
@@ -438,6 +443,23 @@
       },
       getTriggerRect(trigger) {
         return trigger?.querySelector(".ytp-time-wrapper")?.getBoundingClientRect() || trigger?.getBoundingClientRect() || null;
+      },
+      getPanelPosition(trigger, panel) {
+        const triggerRect = this.getTriggerRect(trigger);
+        if (!triggerRect) {
+          return false;
+        }
+
+        const panelRect = panel.getBoundingClientRect();
+        const left = triggerRect.right - panelRect.width;
+        const top = triggerRect.bottom - panelRect.height;
+        const hasRoom =
+          left >= 0 &&
+          top >= 0 &&
+          left + panelRect.width <= window.innerWidth &&
+          top + panelRect.height <= window.innerHeight;
+
+        return hasRoom ? { left, top } : false;
       }
     };
   }
@@ -456,22 +478,68 @@
       return overlay;
     }
 
+    function isVisibleRect(rect) {
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        rect.right > 0 &&
+        rect.bottom > 0 &&
+        rect.left < window.innerWidth &&
+        rect.top < window.innerHeight
+      );
+    }
+
+    function findPlayerRect(video) {
+      const videoRect = video.getBoundingClientRect();
+      let bestRect = isVisibleRect(videoRect) ? videoRect : null;
+      let parent = video.parentElement;
+
+      while (parent && parent !== document.body && parent !== document.documentElement) {
+        const rect = parent.getBoundingClientRect();
+        const containsVideo =
+          rect.left <= videoRect.left &&
+          rect.right >= videoRect.right &&
+          rect.top <= videoRect.top &&
+          rect.bottom >= videoRect.bottom;
+        const fitsViewport = rect.width <= window.innerWidth + 2 && rect.height <= window.innerHeight + 2;
+
+        if (containsVideo && fitsViewport && isVisibleRect(rect)) {
+          bestRect = rect;
+        }
+
+        parent = parent.parentElement;
+      }
+
+      if (!bestRect && window.location.hostname === "player.vimeo.com") {
+        return {
+          left: 0,
+          right: window.innerWidth,
+          top: 0,
+          bottom: window.innerHeight,
+          width: window.innerWidth,
+          height: window.innerHeight
+        };
+      }
+
+      return bestRect;
+    }
+
     function positionOverlay(video) {
       if (!video?.isConnected) {
         return null;
       }
 
-      const rect = video.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) {
+      const rect = findPlayerRect(video);
+      if (!rect) {
         return null;
       }
 
       const target = ensureOverlay();
 
-      const width = Math.min(Math.max(rect.width * 0.18, 64), 96);
+      const width = Math.min(Math.max(rect.width * 0.12, 64), 92);
       const height = 44;
       const left = rect.left + rect.width / 2 - width / 2;
-      const top = rect.bottom - height - 58;
+      const top = rect.bottom - height - 92;
 
       target.style.left = `${left}px`;
       target.style.top = `${top}px`;
@@ -480,10 +548,15 @@
       return target;
     }
 
+    function findProgressBarContainer() {
+      const progressBar = document.querySelector("[data-progress-bar='true']");
+      return progressBar?.parentElement || progressBar;
+    }
+
     return {
       findVideo: findActiveVideo,
       findTrigger(video) {
-        return positionOverlay(video);
+        return findProgressBarContainer() || positionOverlay(video);
       },
       areControlsVisible(trigger) {
         return document.visibilityState === "visible" && !!trigger?.isConnected;
@@ -500,20 +573,25 @@
 
         const panelRect = panel.getBoundingClientRect();
         const viewportPadding = 12;
-        const belowProgressOffset = 20;
+        const belowProgressOffset = 10;
+        const top = triggerRect.bottom + belowProgressOffset;
+        const maxLeft = window.innerWidth - panelRect.width - viewportPadding;
+
+        if (maxLeft < viewportPadding) {
+          return false;
+        }
+
         const left = Math.min(
-          Math.max(triggerRect.left + triggerRect.width / 2 - panelRect.width / 2, viewportPadding),
-          window.innerWidth - panelRect.width - viewportPadding
-        );
-        const top = Math.min(
-          Math.max(triggerRect.bottom + belowProgressOffset, viewportPadding),
-          window.innerHeight - panelRect.height - viewportPadding
+          Math.max(triggerRect.right - panelRect.width, viewportPadding),
+          maxLeft
         );
 
         return { left, top };
       },
       afterUpdate(target, video) {
-        positionOverlay(video);
+        if (target.id === VIMEO_TRIGGER_ID) {
+          positionOverlay(video);
+        }
       },
       cleanup() {
         overlay?.remove();
