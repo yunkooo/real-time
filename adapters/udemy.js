@@ -3,8 +3,17 @@
   const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = YRTC.video;
 
   function createUdemyAdapter() {
-    function findProgressBar() {
-      return document.querySelector('[data-purpose="video-progress-bar"]');
+    function findProgressDisplay() {
+      const displays = [...document.querySelectorAll('[data-purpose="progress-display"]')];
+      return (
+        displays.find(
+          (display) =>
+            display.querySelector('[data-purpose="current-time"]') &&
+            display.querySelector('[data-purpose="duration"]')
+        ) ||
+        displays[0] ||
+        null
+      );
     }
 
     function isVisibleElement(element) {
@@ -24,7 +33,7 @@
     return {
       findVideo: findActiveVideo,
       findTrigger() {
-        return findProgressBar();
+        return findProgressDisplay();
       },
       areControlsVisible(trigger) {
         return document.visibilityState === "visible" && isVisibleElement(trigger);
