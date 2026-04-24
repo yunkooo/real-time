@@ -14,7 +14,8 @@
         maxWidth: Number.POSITIVE_INFINITY,
         height: 44,
         bottomOffset: 0,
-        leftOffset: 0
+        leftOffset: 0,
+        useVideoFrame: true
       });
     }
 

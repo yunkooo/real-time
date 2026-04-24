@@ -33,6 +33,7 @@
         maxWidth: 92,
         height: 44,
         bottomOffset: 92,
+        useVideoFrame: true,
         fallbackRect: getFallbackRect
       });
     }

@@ -104,6 +104,57 @@
     return bestRect;
   }
 
+  function createRect(left, top, width, height) {
+    return {
+      left,
+      top,
+      width,
+      height,
+      right: left + width,
+      bottom: top + height
+    };
+  }
+
+  function getVideoElementRect(video, fallbackRect) {
+    if (!video?.isConnected) {
+      return fallbackRect?.() || null;
+    }
+
+    const videoRect = video.getBoundingClientRect();
+    return isVisibleRect(videoRect) ? videoRect : fallbackRect?.() || null;
+  }
+
+  function getVideoFrameRect(video, fallbackRect) {
+    const elementRect = getVideoElementRect(video, fallbackRect);
+    if (!elementRect) {
+      return null;
+    }
+
+    const videoWidth = Number(video?.videoWidth);
+    const videoHeight = Number(video?.videoHeight);
+    const hasIntrinsicSize = Number.isFinite(videoWidth) && videoWidth > 0 && Number.isFinite(videoHeight) && videoHeight > 0;
+
+    if (!hasIntrinsicSize || elementRect.width <= 0 || elementRect.height <= 0) {
+      return elementRect;
+    }
+
+    const objectFit = getComputedStyle(video).objectFit;
+    if (objectFit === "fill" || objectFit === "cover") {
+      return elementRect;
+    }
+
+    const frameRatio = videoWidth / videoHeight;
+    const elementRatio = elementRect.width / elementRect.height;
+
+    if (elementRatio > frameRatio) {
+      const width = elementRect.height * frameRatio;
+      return createRect(elementRect.left + (elementRect.width - width) / 2, elementRect.top, width, elementRect.height);
+    }
+
+    const height = elementRect.width / frameRatio;
+    return createRect(elementRect.left, elementRect.top + (elementRect.height - height) / 2, elementRect.width, height);
+  }
+
   function createOverlayController(id) {
     let overlay = null;
 
@@ -120,7 +171,9 @@
 
     return {
       position(video, options = {}) {
-        const rect = findPlayerRect(video) || options.fallbackRect?.();
+        const rect = options.useVideoFrame
+          ? getVideoFrameRect(video, options.fallbackRect)
+          : findPlayerRect(video) || options.fallbackRect?.();
         if (!rect) {
           return null;
         }
@@ -156,7 +209,7 @@
   }
 
   function getVideoTopLeftPanelPosition(video, panel, fallbackRect) {
-    const rect = findPlayerRect(video) || fallbackRect?.();
+    const rect = getVideoFrameRect(video, fallbackRect);
     if (!rect) {
       return null;
     }
@@ -176,6 +229,7 @@
 
   YRTC.video = {
     findActiveVideo,
+    getVideoFrameRect,
     findPlayerRect,
     isUsableVideo,
     getVideoRate,
