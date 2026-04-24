@@ -11,7 +11,7 @@
 }
 
 .yrtc-panel {
-  background: rgba(28, 28, 28, 0.96);
+  background: rgba(28, 28, 28, 0.84);
   border-radius: 8px;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.36);
   color: #fff;
@@ -20,7 +20,7 @@
   left: 0;
   min-width: 0;
   opacity: 0;
-  padding: 8px 10px;
+  padding: 9px 12px;
   pointer-events: none;
   position: fixed;
   top: 0;
@@ -38,16 +38,16 @@
   color: rgba(255, 255, 255, 0.72);
   font-size: 11px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .yrtc-row {
   align-items: center;
-  column-gap: 14px;
+  column-gap: 10px;
   display: grid;
-  grid-template-columns: max-content max-content;
+  grid-template-columns: max-content auto;
   justify-content: start;
-  min-height: 20px;
+  min-height: 18px;
 }
 
 .yrtc-row span {
