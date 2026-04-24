@@ -143,6 +143,12 @@
 
     cleanupDisconnectedRefs();
 
+    if (adapter.isSupportedPage?.() === false) {
+      hidePanel();
+      removeVideoListeners?.();
+      return;
+    }
+
     const video = adapter.findVideo();
     if (!video || !getTimeModel(video, adapter)) {
       hidePanel();
@@ -225,6 +231,34 @@
     const host = window.location.hostname;
     if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
       return createVimeoAdapter();
+    }
+
+    if (host === "www.youtube.com" || host === "youtube.com" || host.endsWith(".youtube.com")) {
+      return createGenericAdapter({
+        isSupportedPage() {
+          return (
+            window.location.pathname === "/watch" ||
+            window.location.pathname.startsWith("/embed/") ||
+            window.location.pathname.startsWith("/shorts/")
+          );
+        }
+      });
+    }
+
+    if (host === "udemy.com" || host.endsWith(".udemy.com")) {
+      return createGenericAdapter({
+        isSupportedPage() {
+          return window.location.pathname.includes("/learn/");
+        }
+      });
+    }
+
+    if (host === "inflearn.com" || host.endsWith(".inflearn.com")) {
+      return createGenericAdapter({
+        isSupportedPage() {
+          return window.location.pathname.includes("/lecture/");
+        }
+      });
     }
 
     return createGenericAdapter();

@@ -3,6 +3,14 @@
   const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = YRTC.video;
 
   function createVimeoAdapter() {
+    function isSupportedPage() {
+      if (window.location.hostname === "player.vimeo.com") {
+        return true;
+      }
+
+      return /^\/\d+(?:$|\/)/.test(window.location.pathname);
+    }
+
     function getFallbackRect() {
       if (window.location.hostname !== "player.vimeo.com") {
         return null;
@@ -19,6 +27,7 @@
     }
 
     return {
+      isSupportedPage,
       findVideo: findActiveVideo,
       getPlaybackRate: getVideoRate,
       getPanelPosition(video, panel) {

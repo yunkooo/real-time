@@ -12,6 +12,7 @@
   /**
    * @typedef {Object} VideoAdapter
    * @property {() => HTMLVideoElement | null} findVideo
+   * @property {() => boolean} [isSupportedPage]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
    * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
    * @property {() => void} [cleanup]
