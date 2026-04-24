@@ -3,7 +3,7 @@
 
   YRTC.constants = {
     STORAGE_KEY: "enabled",
-    PANEL_ID: "yrtc-panel",
+    PANEL_ID: "realtime-panel",
     DEFAULT_STATE: { enabled: true },
     UPDATE_INTERVAL_MS: 500,
     RATE_CACHE_GRACE_MS: 900

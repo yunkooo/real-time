@@ -6,7 +6,7 @@
   function createPanel() {
     const panel = document.createElement("div");
     panel.id = PANEL_ID;
-    panel.className = "yrtc-panel";
+    panel.className = "realtime-panel";
     panel.setAttribute("role", "tooltip");
     return panel;
   }
@@ -21,11 +21,11 @@
   }
 
   function hidePanel() {
-    document.getElementById(PANEL_ID)?.classList.remove("yrtc-panel-visible");
+    document.getElementById(PANEL_ID)?.classList.remove("realtime-panel-visible");
   }
 
   function isPanelVisible() {
-    return document.getElementById(PANEL_ID)?.classList.contains("yrtc-panel-visible") === true;
+    return document.getElementById(PANEL_ID)?.classList.contains("realtime-panel-visible") === true;
   }
 
   function removePanel() {
@@ -34,9 +34,8 @@
 
   function setPanelContent(panel, model) {
     panel.innerHTML = `
-      <div class="yrtc-panel-title">Adjusted time</div>
-      <div class="yrtc-row"><span>Speed</span><strong>${formatRate(model.rate)}</strong></div>
-      <div class="yrtc-row"><span>Real time</span><strong>${formatDuration(model.realRemaining)}</strong></div>
+      <div class="realtime-row"><span>Speed</span><strong>${formatRate(model.rate)}</strong></div>
+      <div class="realtime-row"><span>Time</span><strong>${formatDuration(model.realRemaining)}</strong></div>
     `;
   }
 

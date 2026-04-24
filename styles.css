@@ -1,4 +1,4 @@
-.yrtc-panel {
+.realtime-panel {
   background: rgba(28, 28, 28, 0.84);
   border-radius: 8px;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.36);
@@ -8,7 +8,7 @@
   left: 0;
   min-width: 0;
   opacity: 0;
-  padding: 9px 12px;
+  padding: 6px 8px;
   pointer-events: none;
   position: fixed;
   top: 0;
@@ -17,33 +17,26 @@
   z-index: 2147483647;
 }
 
-.yrtc-panel-visible {
+.realtime-panel-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.yrtc-panel-title {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.yrtc-row {
+.realtime-row {
   align-items: center;
-  column-gap: 10px;
+  column-gap: 6px;
   display: grid;
   grid-template-columns: max-content auto;
   justify-content: start;
-  min-height: 18px;
+  min-height: 16px;
 }
 
-.yrtc-row span {
+.realtime-row span {
   color: rgba(255, 255, 255, 0.72);
   white-space: nowrap;
 }
 
-.yrtc-row strong {
+.realtime-row strong {
   color: #fff;
   font-size: 12px;
   font-weight: 700;

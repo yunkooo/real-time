@@ -86,7 +86,7 @@
 
     const panel = ensurePanel();
     setPanelContent(panel, model);
-    panel.classList.add("yrtc-panel-visible");
+    panel.classList.add("realtime-panel-visible");
     positionPanel(video, panel, adapter);
   }
 
