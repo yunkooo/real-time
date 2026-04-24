@@ -15,7 +15,14 @@
         "https://vimeo.com/*",
         "https://player.vimeo.com/*"
       ],
-      "js": ["content.js"],
+      "js": [
+        "content-utils.js",
+        "content-panel.js",
+        "adapters/youtube.js",
+        "adapters/vimeo.js",
+        "adapters/generic.js",
+        "content.js"
+      ],
       "css": ["styles.css"],
       "all_frames": true,
       "run_at": "document_idle"
