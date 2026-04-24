@@ -23,23 +23,6 @@
       },
       getTriggerRect(trigger) {
         return trigger?.querySelector(".ytp-time-wrapper")?.getBoundingClientRect() || trigger?.getBoundingClientRect() || null;
-      },
-      getPanelPosition(trigger, panel) {
-        const triggerRect = this.getTriggerRect(trigger);
-        if (!triggerRect) {
-          return false;
-        }
-
-        const panelRect = panel.getBoundingClientRect();
-        const left = triggerRect.right - panelRect.width;
-        const top = triggerRect.bottom - panelRect.height;
-        const hasRoom =
-          left >= 0 &&
-          top >= 0 &&
-          left + panelRect.width <= window.innerWidth &&
-          top + panelRect.height <= window.innerHeight;
-
-        return hasRoom ? { left, top } : false;
       }
     };
   }

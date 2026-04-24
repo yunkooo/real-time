@@ -155,6 +155,35 @@
     return createRect(elementRect.left, elementRect.top + (elementRect.height - height) / 2, elementRect.width, height);
   }
 
+  function isPointInsideVideoSurface(video, x, y) {
+    const parent = video?.parentElement;
+    if (!parent) {
+      return false;
+    }
+
+    return document.elementsFromPoint(x, y).some((element) => element === video || parent.contains(element));
+  }
+
+  function getVisibleVideoFrameRect(video, fallbackRect) {
+    const frameRect = getVideoFrameRect(video, fallbackRect);
+    if (!frameRect || !video?.isConnected) {
+      return frameRect;
+    }
+
+    const viewportPadding = 1;
+    const sampleX = Math.min(Math.max(frameRect.right - 24, viewportPadding), window.innerWidth - viewportPadding);
+    const startY = Math.max(frameRect.top, 0);
+    const endY = Math.min(frameRect.bottom, window.innerHeight);
+
+    for (let y = startY; y <= endY; y += 8) {
+      if (isPointInsideVideoSurface(video, sampleX, y)) {
+        return createRect(frameRect.left, y, frameRect.width, frameRect.bottom - y);
+      }
+    }
+
+    return frameRect;
+  }
+
   function createOverlayController(id) {
     let overlay = null;
 
@@ -208,15 +237,19 @@
     };
   }
 
-  function getVideoTopLeftPanelPosition(video, panel, fallbackRect) {
-    const rect = getVideoFrameRect(video, fallbackRect);
+  function getVideoTopRightPanelPosition(video, panel, fallbackRect) {
+    const rect = getVisibleVideoFrameRect(video, fallbackRect);
     if (!rect) {
       return null;
     }
 
+    const panelRect = panel.getBoundingClientRect();
     const viewportPadding = 12;
     const inset = 16;
-    const left = Math.max(rect.left + inset, viewportPadding);
+    const left = Math.min(
+      Math.max(rect.right - panelRect.width - inset, viewportPadding),
+      window.innerWidth - panelRect.width - viewportPadding
+    );
     const top = Math.max(rect.top + inset, viewportPadding);
 
     return { left, top };
@@ -234,7 +267,7 @@
     isUsableVideo,
     getVideoRate,
     createOverlayController,
-    getVideoTopLeftPanelPosition
+    getVideoTopRightPanelPosition
   };
 
   YRTC.adapters = YRTC.adapters || {};
