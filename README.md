@@ -16,6 +16,8 @@ Real time   15:00
 
 - YouTube
 - Vimeo
+- Udemy
+- Inflearn
 
 ## 지원 구조
 
@@ -25,6 +27,8 @@ Real-time은 사이트마다 hover하는 위치가 조금 다릅니다.
 | --- | --- | --- |
 | YouTube | 시간 컨테이너 | 시간 컨테이너 바로 위 |
 | Vimeo | progress bar | 영상 좌측 상단 |
+| Udemy | 시간 표시 영역 | 영상 좌측 상단 |
+| Inflearn | 시간 표시 버튼 | 영상 좌측 상단 |
 
 ## 주요 기능
 
