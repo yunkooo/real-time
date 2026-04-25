@@ -13,7 +13,10 @@
    * @typedef {Object} VideoAdapter
    * @property {() => HTMLVideoElement | null} findVideo
    * @property {() => boolean} [isSupportedPage]
+   * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findTrigger]
+   * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
+   * @property {(trigger: HTMLElement) => DOMRect | null} [getTriggerRect]
    * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
    * @property {() => void} [cleanup]
    */
@@ -59,6 +62,20 @@
   function getVideoRate(video) {
     const rate = Number(video?.playbackRate);
     return Number.isFinite(rate) && rate > 0 ? rate : null;
+  }
+
+  function isVisibleElement(element) {
+    if (!element?.isConnected) {
+      return false;
+    }
+
+    const rect = element.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+      return false;
+    }
+
+    const style = getComputedStyle(element);
+    return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) !== 0;
   }
 
   function isVisibleRect(rect) {
@@ -174,6 +191,7 @@
   RealTime.video = {
     findActiveVideo,
     getVideoFrameRect,
+    isVisibleElement,
     isUsableVideo,
     getVideoRate,
     getVideoTopLeftPanelPosition

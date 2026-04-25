@@ -26,10 +26,24 @@
       };
     }
 
+    function findProgressBarContainer() {
+      const progressBar = document.querySelector("[data-progress-bar='true']");
+      return progressBar?.parentElement || progressBar;
+    }
+
     return {
       isSupportedPage,
       findVideo: findActiveVideo,
+      findTrigger() {
+        return findProgressBarContainer();
+      },
+      isTriggerVisible(trigger) {
+        return document.visibilityState === "visible" && !!trigger?.isConnected;
+      },
       getPlaybackRate: getVideoRate,
+      getTriggerRect(trigger) {
+        return trigger?.getBoundingClientRect() || null;
+      },
       getPanelPosition(video, panel) {
         return getVideoTopLeftPanelPosition(video, panel, getFallbackRect);
       }

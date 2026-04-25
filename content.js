@@ -8,18 +8,23 @@
   } = RealTime.constants;
   const {
     createGenericAdapter,
+    createInflearnAdapter,
+    createUdemyAdapter,
+    createYouTubeAdapter,
     createVimeoAdapter
   } = RealTime.adapters;
-  const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = RealTime.panel;
+  const { ensurePanel, hidePanel, isPanelVisible, positionPanel, removePanel, setPanelContent } = RealTime.panel;
   const { getVideoRate, isUsableVideo } = RealTime.video;
 
   let enabled = true;
   let updateTimer = null;
   let mutationObserver = null;
   let currentVideo = null;
+  let triggerElement = null;
   let lastKnownRate = 1;
   let lastRateChangedAt = 0;
   let pendingUpdateFrame = null;
+  let removeTriggerListeners = null;
   let removeVideoListeners = null;
 
   function readSetting() {
@@ -90,6 +95,42 @@
     positionPanel(video, panel, adapter);
   }
 
+  function hidePanelAndCleanupTrigger() {
+    hidePanel();
+    removeTriggerListeners?.();
+  }
+
+  function bindTrigger(target, adapter) {
+    if (triggerElement === target && removeTriggerListeners) {
+      return;
+    }
+
+    removeTriggerListeners?.();
+    triggerElement = target;
+
+    const handleMouseEnter = () => {
+      if (!adapter.isTriggerVisible?.(target)) {
+        hidePanel();
+        return;
+      }
+
+      showPanel(adapter.findVideo(), adapter);
+    };
+    const handleMouseLeave = () => hidePanel();
+
+    target.addEventListener("mouseenter", handleMouseEnter);
+    target.addEventListener("mouseleave", handleMouseLeave);
+
+    removeTriggerListeners = () => {
+      target.removeEventListener("mouseenter", handleMouseEnter);
+      target.removeEventListener("mouseleave", handleMouseLeave);
+      removeTriggerListeners = null;
+      if (triggerElement === target) {
+        triggerElement = null;
+      }
+    };
+  }
+
   function bindVideo(video, adapter) {
     if (currentVideo === video && removeVideoListeners) {
       return;
@@ -106,7 +147,11 @@
     }
 
     const boundVideo = video;
-    const handleVideoUpdate = () => showPanel(boundVideo, adapter);
+    const handleVideoUpdate = () => {
+      if (!triggerElement || isPanelVisible()) {
+        showPanel(boundVideo, adapter);
+      }
+    };
 
     boundVideo.addEventListener("ratechange", handleVideoUpdate);
     boundVideo.addEventListener("timeupdate", handleVideoUpdate);
@@ -124,12 +169,17 @@
   }
 
   function cleanupDisconnectedRefs() {
+    if (triggerElement && !triggerElement.isConnected) {
+      removeTriggerListeners?.();
+      hidePanel();
+    }
     if (currentVideo && !currentVideo.isConnected) {
       removeVideoListeners?.();
     }
   }
 
   function removeUi(adapter) {
+    removeTriggerListeners?.();
     removeVideoListeners?.();
     removePanel();
     adapter.cleanup?.();
@@ -144,20 +194,34 @@
     cleanupDisconnectedRefs();
 
     if (adapter.isSupportedPage?.() === false) {
-      hidePanel();
+      hidePanelAndCleanupTrigger();
       removeVideoListeners?.();
       return;
     }
 
     const video = adapter.findVideo();
     if (!video || !getTimeModel(video, adapter)) {
-      hidePanel();
+      hidePanelAndCleanupTrigger();
       removeVideoListeners?.();
       return;
     }
 
     bindVideo(video, adapter);
-    showPanel(video, adapter);
+
+    const trigger = adapter.findTrigger?.(video) || null;
+    if (!trigger) {
+      removeTriggerListeners?.();
+      showPanel(video, adapter);
+      return;
+    }
+
+    bindTrigger(trigger, adapter);
+
+    if (!adapter.isTriggerVisible?.(trigger)) {
+      hidePanel();
+    } else if (trigger.matches(":hover")) {
+      showPanel(video, adapter);
+    }
   }
 
   function startUpdating(adapter) {
@@ -234,7 +298,7 @@
     }
 
     if (host === "www.youtube.com" || host === "youtube.com" || host.endsWith(".youtube.com")) {
-      return createGenericAdapter({
+      return createYouTubeAdapter({
         isSupportedPage() {
           return (
             window.location.pathname === "/watch" ||
@@ -246,7 +310,7 @@
     }
 
     if (host === "udemy.com" || host.endsWith(".udemy.com")) {
-      return createGenericAdapter({
+      return createUdemyAdapter({
         isSupportedPage() {
           return window.location.pathname.includes("/learn/");
         }
@@ -254,7 +318,7 @@
     }
 
     if (host === "inflearn.com" || host.endsWith(".inflearn.com")) {
-      return createGenericAdapter({
+      return createInflearnAdapter({
         isSupportedPage() {
           return window.location.pathname.includes("/lecture/");
         }
