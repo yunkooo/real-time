@@ -1,6 +1,6 @@
 (() => {
-  const YRTC = window.YRTC;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = YRTC.video;
+  const RealTime = window.RealTime;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = RealTime.video;
 
   function createVimeoAdapter() {
     function isSupportedPage() {
@@ -36,5 +36,5 @@
     };
   }
 
-  YRTC.adapters.createVimeoAdapter = createVimeoAdapter;
+  RealTime.adapters.createVimeoAdapter = createVimeoAdapter;
 })();

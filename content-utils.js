@@ -1,7 +1,7 @@
 (() => {
-  const YRTC = (window.YRTC = window.YRTC || {});
+  const RealTime = (window.RealTime = window.RealTime || {});
 
-  YRTC.constants = {
+  RealTime.constants = {
     STORAGE_KEY: "enabled",
     PANEL_ID: "realtime-panel",
     DEFAULT_STATE: { enabled: true },
@@ -166,12 +166,12 @@
     return { left, top };
   }
 
-  YRTC.format = {
+  RealTime.format = {
     formatDuration,
     formatRate
   };
 
-  YRTC.video = {
+  RealTime.video = {
     findActiveVideo,
     getVideoFrameRect,
     isUsableVideo,
@@ -179,5 +179,5 @@
     getVideoTopLeftPanelPosition
   };
 
-  YRTC.adapters = YRTC.adapters || {};
+  RealTime.adapters = RealTime.adapters || {};
 })();

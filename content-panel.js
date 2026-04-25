@@ -1,7 +1,7 @@
 (() => {
-  const YRTC = window.YRTC;
-  const { PANEL_ID } = YRTC.constants;
-  const { formatDuration, formatRate } = YRTC.format;
+  const RealTime = window.RealTime;
+  const { PANEL_ID } = RealTime.constants;
+  const { formatDuration, formatRate } = RealTime.format;
 
   function createPanel() {
     const panel = document.createElement("div");
@@ -67,7 +67,7 @@
     panel.style.top = `${top}px`;
   }
 
-  YRTC.panel = {
+  RealTime.panel = {
     ensurePanel,
     hidePanel,
     isPanelVisible,

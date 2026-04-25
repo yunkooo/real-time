@@ -1,6 +1,6 @@
 (() => {
-  const YRTC = window.YRTC;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = YRTC.video;
+  const RealTime = window.RealTime;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = RealTime.video;
 
   function createGenericAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -15,5 +15,5 @@
     };
   }
 
-  YRTC.adapters.createGenericAdapter = createGenericAdapter;
+  RealTime.adapters.createGenericAdapter = createGenericAdapter;
 })();

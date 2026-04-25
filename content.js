@@ -1,17 +1,17 @@
 (() => {
-  const YRTC = window.YRTC;
+  const RealTime = window.RealTime;
   const {
     DEFAULT_STATE,
     RATE_CACHE_GRACE_MS,
     STORAGE_KEY,
     UPDATE_INTERVAL_MS
-  } = YRTC.constants;
+  } = RealTime.constants;
   const {
     createGenericAdapter,
     createVimeoAdapter
-  } = YRTC.adapters;
-  const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = YRTC.panel;
-  const { getVideoRate, isUsableVideo } = YRTC.video;
+  } = RealTime.adapters;
+  const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = RealTime.panel;
+  const { getVideoRate, isUsableVideo } = RealTime.video;
 
   let enabled = true;
   let updateTimer = null;
