@@ -19,9 +19,9 @@ Time   15:00
 
 <table align="center">
   <tr>
-    <td align="center"><a href="https://www.youtube.com/"><img src="./assets/icons/yotube_logo.svg" width="150" alt="YouTube"></a></td>
-    <td align="center"><a href="https://vimeo.com/"><img src="./assets/icons/vimeo_logo.svg" width="104" alt="Vimeo"></a></td>
-    <td align="center"><a href="https://www.udemy.com/"><img src="./assets/icons/udemy_logo.svg" width="92" alt="Udemy"></a></td>
+    <td align="center"><a href="https://www.youtube.com/"><img src="./assets/icons/yotube_logo.svg" width="140" alt="YouTube"></a></td>
+    <td align="center"><a href="https://vimeo.com/"><img src="./assets/icons/vimeo_logo.svg" width="140" alt="Vimeo"></a></td>
+    <td align="center"><a href="https://www.udemy.com/"><img src="./assets/icons/udemy_logo.svg" width="140" alt="Udemy"></a></td>
   </tr>
   <tr>
     <td align="center" style="border-top: 0;">YouTube</td>
@@ -29,9 +29,9 @@ Time   15:00
     <td align="center" style="border-top: 0;">Udemy</td>
   </tr>
   <tr>
-    <td align="center"><a href="https://www.inflearn.com/"><img src="./assets/icons/inflearn_logo.svg" width="104" alt="Inflearn"></a></td>
-    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="./assets/icons/ebsi_logo.svg" width="104" alt="EBSi"></a></td>
-    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="./assets/icons/ebsMid_logo.svg" width="92" alt="EBS 중학"></a></td>
+    <td align="center"><a href="https://www.inflearn.com/"><img src="./assets/icons/inflearn_logo.svg" width="140" alt="Inflearn"></a></td>
+    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="./assets/icons/ebsi_logo.svg" width="140" alt="EBSi"></a></td>
+    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="./assets/icons/ebsMid_logo.svg" width="140" alt="EBS 중학"></a></td>
   </tr>
   <tr>
     <td align="center" style="border-top: 0;">Inflearn</td>
