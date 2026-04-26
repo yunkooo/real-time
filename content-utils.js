@@ -14,6 +14,8 @@
    * @property {() => HTMLVideoElement | null} findVideo
    * @property {() => boolean} [isSupportedPage]
    * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findTrigger]
+   * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findPointerActivityTarget]
+   * @property {number} [pointerActivityHideDelayMs]
    * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
    * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]

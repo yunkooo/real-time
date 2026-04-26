@@ -29,7 +29,11 @@
         "https://udemy.com/*",
         "https://*.udemy.com/*",
         "https://inflearn.com/*",
-        "https://*.inflearn.com/*"
+        "https://*.inflearn.com/*",
+        "https://www.ebsi.co.kr/*",
+        "https://*.ebsi.co.kr/*",
+        "https://mid.ebs.co.kr/*",
+        "https://lms.kmooc.kr/*"
       ],
       "js": [
         "content-utils.js",
@@ -38,6 +42,8 @@
         "platforms/vimeo.js",
         "platforms/udemy.js",
         "platforms/inflearn.js",
+        "platforms/ebsi.js",
+        "platforms/kmooc.js",
         "content.js"
       ],
       "css": ["styles.css"],

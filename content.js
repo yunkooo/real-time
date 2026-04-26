@@ -8,7 +8,9 @@
     UPDATE_INTERVAL_MS
   } = Realtime.constants;
   const {
+    createEbsiAdapter,
     createInflearnAdapter,
+    createKmoocAdapter,
     createUdemyAdapter,
     createYouTubeAdapter,
     createVimeoAdapter
@@ -25,9 +27,12 @@
   let lastRateChangedAt = 0;
   let pendingUpdateFrame = null;
   let removeTriggerListeners = null;
+  let removePointerActivityListeners = null;
   let removeVideoListeners = null;
   let panelMode = "hidden";
   let lastPointerPosition = null;
+  let pointerActivityTargetElement = null;
+  let pointerActivityHideTimer = null;
 
   function readSetting() {
     return chrome.storage.sync
@@ -107,6 +112,11 @@
     showPanel(video, adapter);
   }
 
+  function showPointerActivityPanel(video, adapter) {
+    panelMode = "pointer-activity";
+    showPanel(video, adapter);
+  }
+
   function hidePanelWithMode() {
     panelMode = "hidden";
     hidePanel();
@@ -115,6 +125,7 @@
   function hidePanelAndCleanupTrigger() {
     hidePanelWithMode();
     removeTriggerListeners?.();
+    removePointerActivityListeners?.();
   }
 
   function isTriggerUsable(adapter, target) {
@@ -146,13 +157,43 @@
     );
   }
 
+  function isPointerInsideRect(target, pointer) {
+    if (!target?.isConnected || !pointer) {
+      return false;
+    }
+
+    const rect = target.getBoundingClientRect();
+    return pointer.x >= rect.left && pointer.x <= rect.right && pointer.y >= rect.top && pointer.y <= rect.bottom;
+  }
+
   function isTriggerHovered(adapter, target) {
     return isTriggerUsable(adapter, target) && target.matches(":hover") && isPointerInsideElement(target);
+  }
+
+  function clearPointerActivityHideTimer() {
+    if (pointerActivityHideTimer) {
+      window.clearTimeout(pointerActivityHideTimer);
+      pointerActivityHideTimer = null;
+    }
+  }
+
+  function schedulePointerActivityHide(adapter) {
+    clearPointerActivityHideTimer();
+    const delay = adapter.pointerActivityHideDelayMs ?? 2000;
+    pointerActivityHideTimer = window.setTimeout(() => {
+      pointerActivityHideTimer = null;
+      hidePanelWithMode();
+    }, delay);
   }
 
   function updateVisiblePanel(video, adapter) {
     if (panelMode === "fallback") {
       showFallbackPanel(video, adapter);
+      return;
+    }
+
+    if (panelMode === "pointer-activity" && pointerActivityTargetElement?.isConnected) {
+      showPointerActivityPanel(video, adapter);
       return;
     }
 
@@ -200,6 +241,54 @@
     };
   }
 
+  function bindPointerActivityTarget(target, adapter) {
+    if (pointerActivityTargetElement === target && removePointerActivityListeners) {
+      return;
+    }
+
+    const hadPointerActivityTarget = !!pointerActivityTargetElement;
+    removePointerActivityListeners?.();
+    if (hadPointerActivityTarget && panelMode === "pointer-activity") {
+      hidePanelWithMode();
+    }
+
+    pointerActivityTargetElement = target;
+
+    const handlePointerMove = (event) => {
+      rememberPointerPosition(event);
+
+      if (!target.isConnected) {
+        removePointerActivityListeners?.();
+        hidePanelWithMode();
+        return;
+      }
+
+      if (!isPointerInsideRect(target, lastPointerPosition)) {
+        return;
+      }
+
+      const video = adapter.findVideo();
+      if (!video || !getTimeModel(video, adapter)) {
+        hidePanelWithMode();
+        return;
+      }
+
+      showPointerActivityPanel(video, adapter);
+      schedulePointerActivityHide(adapter);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove, true);
+
+    removePointerActivityListeners = () => {
+      window.removeEventListener("pointermove", handlePointerMove, true);
+      clearPointerActivityHideTimer();
+      removePointerActivityListeners = null;
+      if (pointerActivityTargetElement === target) {
+        pointerActivityTargetElement = null;
+      }
+    };
+  }
+
   function bindVideo(video, adapter) {
     if (currentVideo === video && removeVideoListeners) {
       return;
@@ -240,6 +329,10 @@
       removeTriggerListeners?.();
       hidePanelWithMode();
     }
+    if (pointerActivityTargetElement && !pointerActivityTargetElement.isConnected) {
+      removePointerActivityListeners?.();
+      hidePanelWithMode();
+    }
     if (currentVideo && !currentVideo.isConnected) {
       removeVideoListeners?.();
     }
@@ -247,6 +340,7 @@
 
   function removeUi(adapter) {
     removeTriggerListeners?.();
+    removePointerActivityListeners?.();
     removeVideoListeners?.();
     panelMode = "hidden";
     removePanel();
@@ -275,6 +369,22 @@
     }
 
     bindVideo(video, adapter);
+
+    if (adapter.findPointerActivityTarget) {
+      const pointerActivityTarget = adapter.findPointerActivityTarget(video);
+      removeTriggerListeners?.();
+
+      if (!pointerActivityTarget) {
+        removePointerActivityListeners?.();
+        hidePanelWithMode();
+        return;
+      }
+
+      bindPointerActivityTarget(pointerActivityTarget, adapter);
+      return;
+    }
+
+    removePointerActivityListeners?.();
 
     const trigger = adapter.findTrigger?.(video) || null;
     if (!trigger) {
@@ -425,6 +535,30 @@
       return createInflearnAdapter({
         isSupportedPage() {
           return window.location.pathname.includes("/lecture/") || window.location.pathname.startsWith("/courses/lecture");
+        }
+      });
+    }
+
+    if (host === "www.ebsi.co.kr" || host === "ebsi.co.kr" || host.endsWith(".ebsi.co.kr")) {
+      return createEbsiAdapter({
+        isSupportedPage() {
+          return window.location.pathname === "/ebs/lms/player/retrieveLmsPlayerHtml5.ebs";
+        }
+      });
+    }
+
+    if (host === "mid.ebs.co.kr") {
+      return createEbsiAdapter({
+        isSupportedPage() {
+          return window.location.pathname === "/pleasure/course/plain/player/main/index";
+        }
+      });
+    }
+
+    if (host === "lms.kmooc.kr") {
+      return createKmoocAdapter({
+        isSupportedPage() {
+          return window.location.pathname === "/mod/vod/viewer.php";
         }
       });
     }
