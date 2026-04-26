@@ -2,6 +2,7 @@
   const Realtime = window.Realtime;
   const {
     DEFAULT_STATE,
+    PANEL_ID,
     RATE_CACHE_GRACE_MS,
     STORAGE_KEY,
     UPDATE_INTERVAL_MS
@@ -328,9 +329,33 @@
     });
   }
 
+  function isPanelNode(node) {
+    if (!node) {
+      return false;
+    }
+
+    const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    return !!element && (element.id === PANEL_ID || !!element.closest?.(`#${PANEL_ID}`));
+  }
+
+  function shouldScheduleForMutations(mutations) {
+    return mutations.some((mutation) => {
+      if (isPanelNode(mutation.target)) {
+        return false;
+      }
+
+      const changedNodes = [...mutation.addedNodes, ...mutation.removedNodes];
+      return changedNodes.length === 0 || changedNodes.some((node) => !isPanelNode(node));
+    });
+  }
+
   function observePageChanges(adapter) {
     mutationObserver?.disconnect();
-    mutationObserver = new MutationObserver(() => scheduleUpdate(adapter));
+    mutationObserver = new MutationObserver((mutations) => {
+      if (shouldScheduleForMutations(mutations)) {
+        scheduleUpdate(adapter);
+      }
+    });
 
     mutationObserver.observe(document.documentElement, {
       attributes: true,
