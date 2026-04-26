@@ -1,7 +1,8 @@
 (() => {
   const Realtime = window.Realtime;
   const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = Realtime.video;
-  const liveRemainingOffsetSeconds = 60 * 60 + 30;
+  const maxVideoRemainingSeconds = 12 * 60 * 60;
+  const liveRemainingOffsetSeconds = 58 * 60 + 30;
 
   function createYouTubeAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -14,8 +15,12 @@
       return !!document.querySelector(".html5-video-player .ytp-live-badge");
     }
 
+    function clampRemainingSeconds(seconds) {
+      return Math.min(seconds, maxVideoRemainingSeconds);
+    }
+
     function getRemainingSeconds(video) {
-      const remaining = Math.max(video.duration - video.currentTime, 0);
+      const remaining = clampRemainingSeconds(Math.max(video.duration - video.currentTime, 0));
       if (!isLiveStream()) {
         return remaining;
       }
