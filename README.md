@@ -85,3 +85,9 @@ Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 
 
 - 영상 재생, 일시정지, 배속 설정을 직접 바꾸지 않습니다.
 - 현재 Chrome 권한은 설정 저장을 위한 `storage`만 사용합니다.
+
+## 개인정보처리방침
+
+- Privacy Policy: https://yunkooo.github.io/real-time/privacy.html
+- Real-time은 popup의 on/off 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
+- 영상의 현재 재생 시간, 전체 길이, 재생 배속은 실제 남은 시간을 계산하기 위해 브라우저 안에서만 읽고, 서버로 전송하거나 저장하지 않습니다.
