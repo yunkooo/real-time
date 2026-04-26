@@ -1,6 +1,6 @@
 (() => {
   const Realtime = window.Realtime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = Realtime.video;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
   const maxVideoRemainingSeconds = 12 * 60 * 60;
   const liveRemainingOffsetSeconds = 58 * 60 + 30;
 
@@ -12,7 +12,7 @@
     }
 
     function isLiveStream() {
-      return !!document.querySelector(".html5-video-player .ytp-live-badge");
+      return isVisibleElement(document.querySelector(".html5-video-player .ytp-live-badge"));
     }
 
     function clampRemainingSeconds(seconds) {
@@ -20,13 +20,13 @@
     }
 
     function getRemainingSeconds(video) {
-      const remaining = clampRemainingSeconds(Math.max(video.duration - video.currentTime, 0));
+      const rawRemaining = Math.max(video.duration - video.currentTime, 0);
       if (!isLiveStream()) {
-        return remaining;
+        return clampRemainingSeconds(rawRemaining);
       }
 
-      const adjustedRemaining = remaining - liveRemainingOffsetSeconds;
-      return adjustedRemaining > 0 ? adjustedRemaining : null;
+      const adjustedRemaining = rawRemaining - liveRemainingOffsetSeconds;
+      return adjustedRemaining > 0 ? clampRemainingSeconds(adjustedRemaining) : null;
     }
 
     return {
