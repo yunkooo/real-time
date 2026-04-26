@@ -76,7 +76,12 @@
     }
 
     const rate = getPlaybackRate(video, adapter);
-    const remaining = Math.max(video.duration - video.currentTime, 0);
+    const adapterRemaining = adapter.getRemainingSeconds?.(video);
+    if (adapterRemaining === null) {
+      return null;
+    }
+
+    const remaining = adapterRemaining ?? Math.max(video.duration - video.currentTime, 0);
 
     return {
       rate,

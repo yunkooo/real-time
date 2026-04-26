@@ -18,6 +18,7 @@
    * @property {number} [pointerActivityHideDelayMs]
    * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
+   * @property {(video: HTMLVideoElement | null) => number | null} [getRemainingSeconds]
    * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
    * @property {() => void} [cleanup]
    */
