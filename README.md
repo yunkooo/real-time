@@ -17,25 +17,70 @@ Time   15:00
 
 ## 현재 지원 사이트
 
-| 사이트 | 사이트 | 사이트 |
-| ------ | ------ | ------ |
-| <a href="https://www.youtube.com/"><img src="https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32" width="16" height="16" alt=""> YouTube</a> | <a href="https://vimeo.com/"><img src="https://www.google.com/s2/favicons?domain=vimeo.com&sz=32" width="16" height="16" alt=""> Vimeo</a> | <a href="https://www.udemy.com/"><img src="https://www.google.com/s2/favicons?domain=www.udemy.com&sz=32" width="16" height="16" alt=""> Udemy</a> |
-| <a href="https://www.inflearn.com/"><img src="https://www.google.com/s2/favicons?domain=www.inflearn.com&sz=32" width="16" height="16" alt=""> Inflearn</a> | <a href="https://www.ebsi.co.kr/"><img src="https://www.google.com/s2/favicons?domain=www.ebsi.co.kr&sz=32" width="16" height="16" alt=""> EBSi</a> | <a href="https://mid.ebs.co.kr/"><img src="https://www.google.com/s2/favicons?domain=mid.ebs.co.kr&sz=32" width="16" height="16" alt=""> EBS 중학</a> |
-| <a href="https://www.kmooc.kr/"><img src="https://www.google.com/s2/favicons?domain=www.kmooc.kr&sz=32" width="16" height="16" alt=""> K-MOOC</a> |  |  |
+<table align="center">
+  <tr>
+    <td align="center"><a href="https://www.youtube.com/"><img src="https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32" width="16" height="16" alt=""> YouTube</a></td>
+    <td align="center"><a href="https://vimeo.com/"><img src="https://www.google.com/s2/favicons?domain=vimeo.com&sz=32" width="16" height="16" alt=""> Vimeo</a></td>
+    <td align="center"><a href="https://www.udemy.com/"><img src="https://www.google.com/s2/favicons?domain=www.udemy.com&sz=32" width="16" height="16" alt=""> Udemy</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://www.inflearn.com/"><img src="https://www.google.com/s2/favicons?domain=www.inflearn.com&sz=32" width="16" height="16" alt=""> Inflearn</a></td>
+    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="https://www.google.com/s2/favicons?domain=www.ebsi.co.kr&sz=32" width="16" height="16" alt=""> EBSi</a></td>
+    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="https://www.google.com/s2/favicons?domain=mid.ebs.co.kr&sz=32" width="16" height="16" alt=""> EBS 중학</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://www.kmooc.kr/"><img src="https://www.google.com/s2/favicons?domain=www.kmooc.kr&sz=32" width="16" height="16" alt=""> K-MOOC</a></td>
+    <td align="center"></td>
+    <td align="center"></td>
+  </tr>
+</table>
 
 ## 지원 구조
 
 Real-time은 사이트별로 정해진 위치에 마우스를 올렸을 때 box를 표시합니다. 해당 위치를 찾지 못하거나 마우스를 올려도 표시할 수 없는 상태라면 현재 재생 중인 `video`를 기준으로 좌측 상단에 항상 표시합니다.
 
-| 사이트   | 기본 표시 조건                    | fallback                 |
-| -------- | --------------------------------- | ------------------------ |
-| YouTube  | 시간 표시 위치                    | 영상 좌측 상단 always-on |
-| Vimeo    | 동영상 진행 바                    | 영상 좌측 상단 always-on |
-| Udemy    | 시간 표시 위치                    | 영상 좌측 상단 always-on |
-| Inflearn | 동영상 진행 바                    | 영상 좌측 상단 always-on |
-| EBSi     | 배속 설정 박스                    | 영상 좌측 상단 always-on |
-| EBS 중학 | 배속 표시 위치                    | 영상 좌측 상단 always-on |
-| K-MOOC   | 영상 프레임 안에서 마우스 움직임 | 영상 좌측 상단 always-on |
+<table align="center">
+  <tr>
+    <th align="center">사이트</th>
+    <th align="center">기본 표시 조건</th>
+    <th align="center">fallback</th>
+  </tr>
+  <tr>
+    <td align="center">YouTube</td>
+    <td align="center">시간 표시 위치</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+  <tr>
+    <td align="center">Vimeo</td>
+    <td align="center">동영상 진행 바</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+  <tr>
+    <td align="center">Udemy</td>
+    <td align="center">시간 표시 위치</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+  <tr>
+    <td align="center">Inflearn</td>
+    <td align="center">동영상 진행 바</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+  <tr>
+    <td align="center">EBSi</td>
+    <td align="center">배속 설정 박스</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+  <tr>
+    <td align="center">EBS 중학</td>
+    <td align="center">배속 표시 위치</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+  <tr>
+    <td align="center">K-MOOC</td>
+    <td align="center">영상 프레임 안에서 마우스 움직임</td>
+    <td align="center">영상 좌측 상단 always-on</td>
+  </tr>
+</table>
 
 ## 주요 기능
 
