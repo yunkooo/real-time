@@ -12,7 +12,7 @@
     createYouTubeAdapter,
     createVimeoAdapter
   } = Realtime.adapters;
-  const { ensurePanel, hidePanel, isPanelVisible, positionPanel, removePanel, setPanelContent } = Realtime.panel;
+  const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = Realtime.panel;
   const { getVideoRate, isUsableVideo } = Realtime.video;
 
   let enabled = true;
@@ -25,6 +25,8 @@
   let pendingUpdateFrame = null;
   let removeTriggerListeners = null;
   let removeVideoListeners = null;
+  let panelMode = "hidden";
+  let lastPointerPosition = null;
 
   function readSetting() {
     return chrome.storage.sync
@@ -94,13 +96,71 @@
     positionPanel(video, panel, adapter);
   }
 
-  function hidePanelAndCleanupTrigger() {
+  function showFallbackPanel(video, adapter) {
+    panelMode = "fallback";
+    showPanel(video, adapter);
+  }
+
+  function showHoverPanel(video, adapter) {
+    panelMode = "hover";
+    showPanel(video, adapter);
+  }
+
+  function hidePanelWithMode() {
+    panelMode = "hidden";
     hidePanel();
+  }
+
+  function hidePanelAndCleanupTrigger() {
+    hidePanelWithMode();
     removeTriggerListeners?.();
   }
 
   function isTriggerUsable(adapter, target) {
     return adapter.isTriggerVisible ? adapter.isTriggerVisible(target) : true;
+  }
+
+  function rememberPointerPosition(event) {
+    lastPointerPosition = {
+      x: event.clientX,
+      y: event.clientY
+    };
+  }
+
+  function isPointerInsideElement(target) {
+    if (!target?.isConnected) {
+      return false;
+    }
+
+    if (!lastPointerPosition) {
+      return target.matches(":hover");
+    }
+
+    const rect = target.getBoundingClientRect();
+    return (
+      lastPointerPosition.x >= rect.left &&
+      lastPointerPosition.x <= rect.right &&
+      lastPointerPosition.y >= rect.top &&
+      lastPointerPosition.y <= rect.bottom
+    );
+  }
+
+  function isTriggerHovered(adapter, target) {
+    return isTriggerUsable(adapter, target) && target.matches(":hover") && isPointerInsideElement(target);
+  }
+
+  function updateVisiblePanel(video, adapter) {
+    if (panelMode === "fallback") {
+      showFallbackPanel(video, adapter);
+      return;
+    }
+
+    if (panelMode === "hover" && triggerElement && isTriggerHovered(adapter, triggerElement)) {
+      showHoverPanel(video, adapter);
+      return;
+    }
+
+    hidePanelWithMode();
   }
 
   function bindTrigger(target, adapter) {
@@ -111,15 +171,20 @@
     removeTriggerListeners?.();
     triggerElement = target;
 
-    const handleMouseEnter = () => {
-      if (!isTriggerUsable(adapter, target)) {
-        hidePanel();
+    const handleMouseEnter = (event) => {
+      rememberPointerPosition(event);
+
+      if (!isTriggerHovered(adapter, target)) {
+        hidePanelWithMode();
         return;
       }
 
-      showPanel(adapter.findVideo(), adapter);
+      showHoverPanel(adapter.findVideo(), adapter);
     };
-    const handleMouseLeave = () => hidePanel();
+    const handleMouseLeave = (event) => {
+      rememberPointerPosition(event);
+      hidePanelWithMode();
+    };
 
     target.addEventListener("mouseenter", handleMouseEnter);
     target.addEventListener("mouseleave", handleMouseLeave);
@@ -151,9 +216,7 @@
 
     const boundVideo = video;
     const handleVideoUpdate = () => {
-      if (!triggerElement || isPanelVisible()) {
-        showPanel(boundVideo, adapter);
-      }
+      updateVisiblePanel(boundVideo, adapter);
     };
 
     boundVideo.addEventListener("ratechange", handleVideoUpdate);
@@ -174,7 +237,7 @@
   function cleanupDisconnectedRefs() {
     if (triggerElement && !triggerElement.isConnected) {
       removeTriggerListeners?.();
-      hidePanel();
+      hidePanelWithMode();
     }
     if (currentVideo && !currentVideo.isConnected) {
       removeVideoListeners?.();
@@ -184,6 +247,7 @@
   function removeUi(adapter) {
     removeTriggerListeners?.();
     removeVideoListeners?.();
+    panelMode = "hidden";
     removePanel();
     adapter.cleanup?.();
   }
@@ -214,22 +278,22 @@
     const trigger = adapter.findTrigger?.(video) || null;
     if (!trigger) {
       removeTriggerListeners?.();
-      showPanel(video, adapter);
+      showFallbackPanel(video, adapter);
       return;
     }
 
     if (!isTriggerUsable(adapter, trigger)) {
       removeTriggerListeners?.();
-      showPanel(video, adapter);
+      hidePanelWithMode();
       return;
     }
 
     bindTrigger(trigger, adapter);
 
-    if (trigger.matches(":hover")) {
-      showPanel(video, adapter);
+    if (isTriggerHovered(adapter, trigger)) {
+      showHoverPanel(video, adapter);
     } else {
-      hidePanel();
+      hidePanelWithMode();
     }
   }
 
@@ -293,6 +357,7 @@
   }
 
   function bindGlobalEvents(adapter) {
+    window.addEventListener("pointermove", rememberPointerPosition, true);
     window.addEventListener("resize", () => {
       if (currentVideo?.isConnected) {
         updateUi(adapter);
