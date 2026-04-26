@@ -1,6 +1,6 @@
 (() => {
   const RealTime = window.RealTime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = RealTime.video;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = RealTime.video;
 
   function createVimeoAdapter() {
     function isSupportedPage() {
@@ -38,12 +38,9 @@
         return findProgressBarContainer();
       },
       isTriggerVisible(trigger) {
-        return document.visibilityState === "visible" && !!trigger?.isConnected;
+        return document.visibilityState === "visible" && isVisibleElement(trigger);
       },
       getPlaybackRate: getVideoRate,
-      getTriggerRect(trigger) {
-        return trigger?.getBoundingClientRect() || null;
-      },
       getPanelPosition(video, panel) {
         return getVideoTopLeftPanelPosition(video, panel, getFallbackRect);
       }

@@ -100,6 +100,10 @@
     removeTriggerListeners?.();
   }
 
+  function isTriggerUsable(adapter, target) {
+    return adapter.isTriggerVisible ? adapter.isTriggerVisible(target) : true;
+  }
+
   function bindTrigger(target, adapter) {
     if (triggerElement === target && removeTriggerListeners) {
       return;
@@ -109,7 +113,7 @@
     triggerElement = target;
 
     const handleMouseEnter = () => {
-      if (!adapter.isTriggerVisible?.(target)) {
+      if (!isTriggerUsable(adapter, target)) {
         hidePanel();
         return;
       }
@@ -215,12 +219,18 @@
       return;
     }
 
+    if (!isTriggerUsable(adapter, trigger)) {
+      removeTriggerListeners?.();
+      showPanel(video, adapter);
+      return;
+    }
+
     bindTrigger(trigger, adapter);
 
-    if (!adapter.isTriggerVisible?.(trigger)) {
-      hidePanel();
-    } else if (trigger.matches(":hover")) {
+    if (trigger.matches(":hover")) {
       showPanel(video, adapter);
+    } else {
+      hidePanel();
     }
   }
 

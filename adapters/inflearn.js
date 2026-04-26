@@ -17,9 +17,6 @@
       },
       isTriggerVisible: isVisibleElement,
       getPlaybackRate: getVideoRate,
-      getTriggerRect(trigger) {
-        return trigger?.getBoundingClientRect() || null;
-      },
       getPanelPosition(video, panel) {
         return getVideoTopLeftPanelPosition(video, panel);
       }

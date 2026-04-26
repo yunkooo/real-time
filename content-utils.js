@@ -16,7 +16,6 @@
    * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findTrigger]
    * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
-   * @property {(trigger: HTMLElement) => DOMRect | null} [getTriggerRect]
    * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
    * @property {() => void} [cleanup]
    */
