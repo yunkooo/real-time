@@ -1,28 +1,37 @@
 (() => {
   const Realtime = window.Realtime;
   const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
+  const { findFirstVisibleElement, parsePlaybackRateText } = Realtime.dom;
 
   function createEbsiAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
 
-    function findSpeedControl() {
-      const currentSpeed = document.querySelector(".mpv_current_speed");
-      if (currentSpeed) {
-        return currentSpeed;
-      }
-
+    function getSpeedControlCandidates() {
       const rateValue = document.querySelector("#rateValue[data-control-id='displayRate']");
-      return rateValue?.closest(".drop.drop_speed") || document.querySelector(".drop.drop_speed");
+      return [
+        document.querySelector(".mpv_current_speed"),
+        rateValue?.closest(".drop.drop_speed"),
+        document.querySelector(".drop.drop_speed")
+      ];
+    }
+
+    function getRateDisplayCandidates() {
+      return [
+        document.querySelector(".mpv_current_speed"),
+        document.querySelector("#rateValue[data-control-id='displayRate']")
+      ];
+    }
+
+    function findSpeedControl() {
+      const candidates = getSpeedControlCandidates();
+      return findFirstVisibleElement(candidates) || candidates.filter(Boolean)[0] || null;
     }
 
     function getDisplayedRate() {
-      const rateElement =
-        document.querySelector(".mpv_current_speed") ||
-        document.querySelector("#rateValue[data-control-id='displayRate']");
+      const candidates = getRateDisplayCandidates();
+      const rateElement = findFirstVisibleElement(candidates) || candidates.filter(Boolean)[0];
       const rateText = rateElement?.textContent || "";
-      const rate = Number.parseFloat(rateText.replace("배속", "").trim());
-
-      return Number.isFinite(rate) && rate > 0 ? rate : null;
+      return parsePlaybackRateText(rateText);
     }
 
     return {

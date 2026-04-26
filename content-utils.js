@@ -79,6 +79,15 @@
     return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) !== 0;
   }
 
+  function findFirstVisibleElement(elements) {
+    return elements.filter(Boolean).find(isVisibleElement) || null;
+  }
+
+  function parsePlaybackRateText(text) {
+    const rate = Number.parseFloat(String(text || "").replace("배속", "").trim());
+    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  }
+
   function isVisibleRect(rect) {
     return (
       rect.width > 0 &&
@@ -196,6 +205,11 @@
     isUsableVideo,
     getVideoRate,
     getVideoTopLeftPanelPosition
+  };
+
+  Realtime.dom = {
+    findFirstVisibleElement,
+    parsePlaybackRateText
   };
 
   Realtime.adapters = Realtime.adapters || {};

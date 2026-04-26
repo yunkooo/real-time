@@ -128,6 +128,11 @@
     removePointerActivityListeners?.();
   }
 
+  function clearInteractionTargets() {
+    removeTriggerListeners?.();
+    removePointerActivityListeners?.();
+  }
+
   function isTriggerUsable(adapter, target) {
     return adapter.isTriggerVisible ? adapter.isTriggerVisible(target) : true;
   }
@@ -339,12 +344,49 @@
   }
 
   function removeUi(adapter) {
-    removeTriggerListeners?.();
-    removePointerActivityListeners?.();
+    clearInteractionTargets();
     removeVideoListeners?.();
     panelMode = "hidden";
     removePanel();
     adapter.cleanup?.();
+  }
+
+  function syncPointerActivityTarget(video, adapter) {
+    const pointerActivityTarget = adapter.findPointerActivityTarget(video);
+    removeTriggerListeners?.();
+
+    if (!pointerActivityTarget) {
+      removePointerActivityListeners?.();
+      hidePanelWithMode();
+      return;
+    }
+
+    bindPointerActivityTarget(pointerActivityTarget, adapter);
+  }
+
+  function syncHoverTrigger(video, adapter) {
+    removePointerActivityListeners?.();
+
+    const trigger = adapter.findTrigger?.(video) || null;
+    if (!trigger) {
+      removeTriggerListeners?.();
+      showFallbackPanel(video, adapter);
+      return;
+    }
+
+    if (!isTriggerUsable(adapter, trigger)) {
+      removeTriggerListeners?.();
+      hidePanelWithMode();
+      return;
+    }
+
+    bindTrigger(trigger, adapter);
+
+    if (isTriggerHovered(adapter, trigger)) {
+      showHoverPanel(video, adapter);
+    } else {
+      hidePanelWithMode();
+    }
   }
 
   function updateUi(adapter) {
@@ -371,41 +413,11 @@
     bindVideo(video, adapter);
 
     if (adapter.findPointerActivityTarget) {
-      const pointerActivityTarget = adapter.findPointerActivityTarget(video);
-      removeTriggerListeners?.();
-
-      if (!pointerActivityTarget) {
-        removePointerActivityListeners?.();
-        hidePanelWithMode();
-        return;
-      }
-
-      bindPointerActivityTarget(pointerActivityTarget, adapter);
+      syncPointerActivityTarget(video, adapter);
       return;
     }
 
-    removePointerActivityListeners?.();
-
-    const trigger = adapter.findTrigger?.(video) || null;
-    if (!trigger) {
-      removeTriggerListeners?.();
-      showFallbackPanel(video, adapter);
-      return;
-    }
-
-    if (!isTriggerUsable(adapter, trigger)) {
-      removeTriggerListeners?.();
-      hidePanelWithMode();
-      return;
-    }
-
-    bindTrigger(trigger, adapter);
-
-    if (isTriggerHovered(adapter, trigger)) {
-      showHoverPanel(video, adapter);
-    } else {
-      hidePanelWithMode();
-    }
+    syncHoverTrigger(video, adapter);
   }
 
   function startUpdating(adapter) {
