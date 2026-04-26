@@ -1,6 +1,7 @@
 (() => {
   const Realtime = window.Realtime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
+  const { isVisibleElement } = Realtime.video;
+  const { createVideoAdapter } = Realtime.adapters;
 
   function createInflearnAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -36,18 +37,13 @@
       return document.elementsFromPoint(x, y).some((target) => target === element || element.contains(target));
     }
 
-    return {
+    return createVideoAdapter({
       isSupportedPage,
-      findVideo: findActiveVideo,
       findTrigger() {
         return findShakaSeekBarContainer();
       },
-      isTriggerVisible: isHoverableElement,
-      getPlaybackRate: getVideoRate,
-      getPanelPosition(video, panel) {
-        return getVideoTopLeftPanelPosition(video, panel);
-      }
-    };
+      isTriggerVisible: isHoverableElement
+    });
   }
 
   Realtime.adapters.createInflearnAdapter = createInflearnAdapter;

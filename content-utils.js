@@ -214,4 +214,14 @@
   };
 
   Realtime.adapters = Realtime.adapters || {};
+  Realtime.adapters.createVideoAdapter = function createVideoAdapter(overrides = {}, options = {}) {
+    return {
+      findVideo: findActiveVideo,
+      getPlaybackRate: getVideoRate,
+      getPanelPosition(video, panel) {
+        return getVideoTopLeftPanelPosition(video, panel, options.getFallbackRect);
+      },
+      ...overrides
+    };
+  };
 })();

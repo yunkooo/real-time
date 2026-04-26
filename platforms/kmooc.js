@@ -1,6 +1,7 @@
 (() => {
   const Realtime = window.Realtime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
+  const { isVisibleElement } = Realtime.video;
+  const { createVideoAdapter } = Realtime.adapters;
 
   function createKmoocAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -67,15 +68,10 @@
       return target;
     }
 
-    return {
+    return createVideoAdapter({
       isSupportedPage,
-      findVideo: findActiveVideo,
       findPointerActivityTarget,
       pointerActivityHideDelayMs: 1000,
-      getPlaybackRate: getVideoRate,
-      getPanelPosition(video, panel) {
-        return getVideoTopLeftPanelPosition(video, panel);
-      },
       cleanup() {
         promotedElements.forEach((style, element) => {
           element.style.position = style.position;
@@ -84,7 +80,7 @@
         });
         promotedElements.clear();
       }
-    };
+    });
   }
 
   Realtime.adapters.createKmoocAdapter = createKmoocAdapter;

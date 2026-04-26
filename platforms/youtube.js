@@ -1,6 +1,7 @@
 (() => {
   const Realtime = window.Realtime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
+  const { isVisibleElement } = Realtime.video;
+  const { createVideoAdapter } = Realtime.adapters;
   const maxVideoRemainingSeconds = 12 * 60 * 60;
   const liveRemainingOffsetSeconds = 58 * 60 + 30;
 
@@ -29,9 +30,8 @@
       return adjustedRemaining > 0 ? clampRemainingSeconds(adjustedRemaining) : null;
     }
 
-    return {
+    return createVideoAdapter({
       isSupportedPage,
-      findVideo: findActiveVideo,
       findTrigger() {
         return findTimeDisplay();
       },
@@ -39,12 +39,8 @@
         const player = document.querySelector(".html5-video-player");
         return !!player && !player.classList.contains("ytp-autohide");
       },
-      getPlaybackRate: getVideoRate,
-      getRemainingSeconds,
-      getPanelPosition(video, panel) {
-        return getVideoTopLeftPanelPosition(video, panel);
-      }
-    };
+      getRemainingSeconds
+    });
   }
 
   Realtime.adapters.createYouTubeAdapter = createYouTubeAdapter;

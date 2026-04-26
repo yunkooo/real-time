@@ -1,6 +1,7 @@
 (() => {
   const Realtime = window.Realtime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
+  const { getVideoRate, isVisibleElement } = Realtime.video;
+  const { createVideoAdapter } = Realtime.adapters;
   const { findFirstVisibleElement, parsePlaybackRateText } = Realtime.dom;
 
   function createEbsiAdapter(options = {}) {
@@ -34,20 +35,16 @@
       return parsePlaybackRateText(rateText);
     }
 
-    return {
+    return createVideoAdapter({
       isSupportedPage,
-      findVideo: findActiveVideo,
       findTrigger() {
         return findSpeedControl();
       },
       isTriggerVisible: isVisibleElement,
       getPlaybackRate(video) {
         return getDisplayedRate() || getVideoRate(video);
-      },
-      getPanelPosition(video, panel) {
-        return getVideoTopLeftPanelPosition(video, panel);
       }
-    };
+    });
   }
 
   Realtime.adapters.createEbsiAdapter = createEbsiAdapter;

@@ -1,6 +1,7 @@
 (() => {
   const Realtime = window.Realtime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
+  const { isVisibleElement } = Realtime.video;
+  const { createVideoAdapter } = Realtime.adapters;
 
   function createUdemyAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -18,18 +19,13 @@
       );
     }
 
-    return {
+    return createVideoAdapter({
       isSupportedPage,
-      findVideo: findActiveVideo,
       findTrigger() {
         return findProgressDisplay();
       },
-      isTriggerVisible: isVisibleElement,
-      getPlaybackRate: getVideoRate,
-      getPanelPosition(video, panel) {
-        return getVideoTopLeftPanelPosition(video, panel);
-      }
-    };
+      isTriggerVisible: isVisibleElement
+    });
   }
 
   Realtime.adapters.createUdemyAdapter = createUdemyAdapter;
