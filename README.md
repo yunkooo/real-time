@@ -1,16 +1,4 @@
-<p align="center">
-  <img src="./assets/icons/icon.svg" alt="Real-time icon" width="120" height="120" />
-</p>
-
-<h1 align="center">Real-time</h1>
-
-<p align="center">
-  현재 재생 배속을 반영해 실제 남은 시간을 보여주는 Chrome 확장프로그램
-</p>
-
-<p align="center">
-  <strong>YouTube</strong> · <strong>Vimeo</strong> · <strong>Udemy</strong> · <strong>Inflearn</strong>
-</p>
+# Real-time
 
 영상 플랫폼에서 현재 배속 기준으로 실제 남은 시간을 보여주는 Chrome 확장프로그램입니다.
 
