@@ -47,8 +47,8 @@
 
   function setPanelContent(panel, model) {
     panel.innerHTML = `
-      <div class="realtime-row"><span>Speed</span><strong>${formatRate(model.rate)}</strong></div>
-      <div class="realtime-row"><span>Time</span><strong>${formatDuration(model.realRemaining)}</strong></div>
+      <div class="realtime-row"><span>speed</span><strong>${formatRate(model.rate)}</strong></div>
+      <div class="realtime-row"><span>time</span><strong>${formatDuration(model.realRemaining)}</strong></div>
     `;
   }
 
