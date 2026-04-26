@@ -1,20 +1,19 @@
 (() => {
-  const RealTime = window.RealTime;
+  const Realtime = window.Realtime;
   const {
     DEFAULT_STATE,
     RATE_CACHE_GRACE_MS,
     STORAGE_KEY,
     UPDATE_INTERVAL_MS
-  } = RealTime.constants;
+  } = Realtime.constants;
   const {
-    createGenericAdapter,
     createInflearnAdapter,
     createUdemyAdapter,
     createYouTubeAdapter,
     createVimeoAdapter
-  } = RealTime.adapters;
-  const { ensurePanel, hidePanel, isPanelVisible, positionPanel, removePanel, setPanelContent } = RealTime.panel;
-  const { getVideoRate, isUsableVideo } = RealTime.video;
+  } = Realtime.adapters;
+  const { ensurePanel, hidePanel, isPanelVisible, positionPanel, removePanel, setPanelContent } = Realtime.panel;
+  const { getVideoRate, isUsableVideo } = Realtime.video;
 
   let enabled = true;
   let updateTimer = null;
@@ -299,6 +298,11 @@
         updateUi(adapter);
       }
     });
+    document.addEventListener("fullscreenchange", () => {
+      if (currentVideo?.isConnected) {
+        updateUi(adapter);
+      }
+    });
   }
 
   function createAdapter() {
@@ -330,12 +334,12 @@
     if (host === "inflearn.com" || host.endsWith(".inflearn.com")) {
       return createInflearnAdapter({
         isSupportedPage() {
-          return window.location.pathname.includes("/lecture/");
+          return window.location.pathname.includes("/lecture/") || window.location.pathname.startsWith("/courses/lecture");
         }
       });
     }
 
-    return createGenericAdapter();
+    return null;
   }
 
   async function init() {

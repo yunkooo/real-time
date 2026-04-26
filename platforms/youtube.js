@@ -1,6 +1,6 @@
 (() => {
-  const RealTime = window.RealTime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = RealTime.video;
+  const Realtime = window.Realtime;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition } = Realtime.video;
 
   function createYouTubeAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -26,5 +26,5 @@
     };
   }
 
-  RealTime.adapters.createYouTubeAdapter = createYouTubeAdapter;
+  Realtime.adapters.createYouTubeAdapter = createYouTubeAdapter;
 })();

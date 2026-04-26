@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Real-time",
+  "name": "Realtime",
   "description": "Shows real remaining time based on the current video playback speed.",
   "version": "0.1.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Real-time"
+    "default_title": "Realtime"
   },
   "permissions": ["storage"],
   "content_scripts": [
@@ -22,11 +22,10 @@
       "js": [
         "content-utils.js",
         "content-panel.js",
-        "adapters/youtube.js",
-        "adapters/vimeo.js",
-        "adapters/udemy.js",
-        "adapters/inflearn.js",
-        "adapters/generic.js",
+        "platforms/youtube.js",
+        "platforms/vimeo.js",
+        "platforms/udemy.js",
+        "platforms/inflearn.js",
         "content.js"
       ],
       "css": ["styles.css"],

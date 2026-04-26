@@ -1,7 +1,7 @@
 (() => {
-  const RealTime = window.RealTime;
-  const { PANEL_ID } = RealTime.constants;
-  const { formatDuration, formatRate } = RealTime.format;
+  const Realtime = window.Realtime;
+  const { PANEL_ID } = Realtime.constants;
+  const { formatDuration, formatRate } = Realtime.format;
 
   function createPanel() {
     const panel = document.createElement("div");
@@ -11,21 +11,34 @@
     return panel;
   }
 
+  function getPanelRoot() {
+    return document.fullscreenElement || document.body;
+  }
+
   function ensurePanel() {
     let panel = document.getElementById(PANEL_ID);
+    const root = getPanelRoot();
     if (!panel) {
       panel = createPanel();
-      document.body.appendChild(panel);
+    }
+    if (panel.parentElement !== root) {
+      root.appendChild(panel);
     }
     return panel;
   }
 
   function hidePanel() {
-    document.getElementById(PANEL_ID)?.classList.remove("realtime-panel-visible");
+    document
+      .getElementById(PANEL_ID)
+      ?.classList.remove("realtime-panel-visible");
   }
 
   function isPanelVisible() {
-    return document.getElementById(PANEL_ID)?.classList.contains("realtime-panel-visible") === true;
+    return (
+      document
+        .getElementById(PANEL_ID)
+        ?.classList.contains("realtime-panel-visible") === true
+    );
   }
 
   function removePanel() {
@@ -67,7 +80,7 @@
     panel.style.top = `${top}px`;
   }
 
-  RealTime.panel = {
+  Realtime.panel = {
     ensurePanel,
     hidePanel,
     isPanelVisible,

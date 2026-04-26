@@ -1,6 +1,6 @@
 (() => {
-  const RealTime = window.RealTime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = RealTime.video;
+  const Realtime = window.Realtime;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
 
   function createVimeoAdapter() {
     function isSupportedPage() {
@@ -47,5 +47,5 @@
     };
   }
 
-  RealTime.adapters.createVimeoAdapter = createVimeoAdapter;
+  Realtime.adapters.createVimeoAdapter = createVimeoAdapter;
 })();

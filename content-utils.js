@@ -1,7 +1,7 @@
 (() => {
-  const RealTime = (window.RealTime = window.RealTime || {});
+  const Realtime = (window.Realtime = window.Realtime || {});
 
-  RealTime.constants = {
+  Realtime.constants = {
     STORAGE_KEY: "enabled",
     PANEL_ID: "realtime-panel",
     DEFAULT_STATE: { enabled: true },
@@ -182,12 +182,12 @@
     return { left, top };
   }
 
-  RealTime.format = {
+  Realtime.format = {
     formatDuration,
     formatRate
   };
 
-  RealTime.video = {
+  Realtime.video = {
     findActiveVideo,
     getVideoFrameRect,
     isVisibleElement,
@@ -196,5 +196,5 @@
     getVideoTopLeftPanelPosition
   };
 
-  RealTime.adapters = RealTime.adapters || {};
+  Realtime.adapters = Realtime.adapters || {};
 })();

@@ -1,10 +1,10 @@
-# Real-time
+# Realtime
 
 영상 플랫폼에서 현재 배속 기준으로 실제 남은 시간을 보여주는 Chrome 확장프로그램입니다.
 
 영상 플랫폼의 기본 시간 표시는 보통 원본 영상 시간을 기준으로 표시됩니다. 하지만 `1.5x`, `2x`처럼 배속을 바꿔서 보고 있다면 실제로 남은 시간은 더 짧습니다.
 
-Real-time은 현재 재생 배속을 반영해서 실제로 몇 분이 남았는지 영상 좌측 상단의 작은 box로 보여줍니다.
+Realtime은 현재 재생 배속을 반영해서 실제로 몇 분이 남았는지 영상 좌측 상단의 작은 box로 보여줍니다.
 
 ```text
 Speed  2x
@@ -20,14 +20,14 @@ Time   15:00
 
 ## 지원 구조
 
-Real-time은 사이트별 시간 표시 영역에 마우스를 올렸을 때 box를 표시합니다. 시간 표시 영역을 찾지 못하거나 실제로 hover할 수 없는 상태라면 현재 재생 중인 `video`를 기준으로 좌측 상단에 항상 표시합니다.
+Realtime은 사이트별 시간 표시 영역에 마우스를 올렸을 때 box를 표시합니다. 시간 표시 영역을 찾지 못하거나 실제로 hover할 수 없는 상태라면 현재 재생 중인 `video`를 기준으로 좌측 상단에 항상 표시합니다.
 
-| 사이트 | 기본 표시 조건 | fallback |
-| --- | --- | --- |
-| YouTube | 시간 컨테이너 hover | 영상 좌측 상단 always-on |
-| Vimeo | progress bar hover | 영상 좌측 상단 always-on |
-| Udemy | 시간 표시 영역 hover | 영상 좌측 상단 always-on |
-| Inflearn | 시간 표시 버튼 hover | 영상 좌측 상단 always-on |
+| 사이트   | 기본 표시 조건       | fallback                 |
+| -------- | -------------------- | ------------------------ |
+| YouTube  | 시간 컨테이너 hover  | 영상 좌측 상단 always-on |
+| Vimeo    | progress bar hover   | 영상 좌측 상단 always-on |
+| Udemy    | 시간 표시 영역 hover | 영상 좌측 상단 always-on |
+| Inflearn | progress bar hover   | 영상 좌측 상단 always-on |
 
 ## 주요 기능
 
@@ -63,7 +63,7 @@ Real-time은 사이트별 시간 표시 영역에 마우스를 올렸을 때 box
 
 ## 동작 방식
 
-Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 시간을 계산합니다.
+Realtime은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 시간을 계산합니다.
 
 - 현재 재생 시간
 - 전체 영상 길이
@@ -79,7 +79,7 @@ Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 
 
 - 확장프로그램을 수정했다면 `chrome://extensions`에서 reload합니다.
 - 이미 열려 있던 영상 페이지는 새로고침합니다.
-- popup에서 Real-time 기능이 켜져 있는지 확인합니다.
+- popup에서 Realtime 기능이 켜져 있는지 확인합니다.
 
 ## 참고
 
@@ -88,6 +88,6 @@ Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 
 
 ## 개인정보처리방침
 
-- Privacy Policy: https://yunkooo.github.io/real-time/privacy.html
-- Real-time은 popup의 on/off 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
+- Privacy Policy: https://yunkooo.github.io/realtime/privacy.html
+- Realtime은 popup의 on/off 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
 - 영상의 현재 재생 시간, 전체 길이, 재생 배속은 실제 남은 시간을 계산하기 위해 브라우저 안에서만 읽고, 서버로 전송하거나 저장하지 않습니다.

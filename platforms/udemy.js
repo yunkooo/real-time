@@ -1,6 +1,6 @@
 (() => {
-  const RealTime = window.RealTime;
-  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = RealTime.video;
+  const Realtime = window.Realtime;
+  const { findActiveVideo, getVideoRate, getVideoTopLeftPanelPosition, isVisibleElement } = Realtime.video;
 
   function createUdemyAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -32,5 +32,5 @@
     };
   }
 
-  RealTime.adapters.createUdemyAdapter = createUdemyAdapter;
+  Realtime.adapters.createUdemyAdapter = createUdemyAdapter;
 })();
