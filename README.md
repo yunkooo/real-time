@@ -1,7 +1,7 @@
 # Real-time
 
 <p align="center">
-  <img src="./assets/icons/icon.svg" alt="Real-time icon" width="120" height="120" />
+  <img src="./assets/icons/icon.svg" alt="Real-time icon" width="144" height="144" />
 </p>
 
 영상 플랫폼에서 현재 배속 기준으로 실제 남은 시간을 보여주는 Chrome 확장프로그램입니다.
@@ -19,19 +19,34 @@ Time   15:00
 
 <table align="center">
   <tr>
-    <td align="center"><a href="https://www.youtube.com/"><img src="https://www.gstatic.com/marketing-cms/assets/images/08/25/fffdc76145f28be3a1ca63859c4a/external-logo-core-1.png%3Dn-w1860-h1047-fcrop64%3D1%2C00000000ffffffff-rw" width="82" alt="YouTube"></a></td>
-    <td align="center"><a href="https://vimeo.com/"><img src="./assets/icons/vimeo_logo.svg" width="82" alt="Vimeo"></a></td>
-    <td align="center"><a href="https://www.udemy.com/"><img src="./assets/icons/udemy.log.svg" width="82" alt="Udemy"></a></td>
+    <td align="center"><a href="https://www.youtube.com/"><img src="./assets/icons/yotube_logo.svg" width="104" alt="YouTube"></a></td>
+    <td align="center"><a href="https://vimeo.com/"><img src="./assets/icons/vimeo_logo.svg" width="104" alt="Vimeo"></a></td>
+    <td align="center"><a href="https://www.udemy.com/"><img src="./assets/icons/udemy_logo.svg" width="104" alt="Udemy"></a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://www.inflearn.com/"><img src="./assets/icons/inflearn_logo.svg" width="82" alt="Inflearn"></a></td>
-    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="./assets/icons/ebsi_logo.svg" width="82" alt="EBSi"></a></td>
-    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="./assets/icons/ebsMid_logo.svg" width="82" alt="EBS 중학"></a></td>
+    <td align="center" style="border-top: 0;">YouTube</td>
+    <td align="center" style="border-top: 0;">Vimeo</td>
+    <td align="center" style="border-top: 0;">Udemy</td>
   </tr>
   <tr>
-    <td align="center"><a href="https://www.kmooc.kr/"><img src="./assets/icons/kmooc_logo.svg" width="82" alt="K-MOOC"></a></td>
+    <td align="center"><a href="https://www.inflearn.com/"><img src="./assets/icons/inflearn_logo.svg" width="104" alt="Inflearn"></a></td>
+    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="./assets/icons/ebsi_logo.svg" width="104" alt="EBSi"></a></td>
+    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="./assets/icons/ebsMid_logo.svg" width="104" alt="EBS 중학"></a></td>
+  </tr>
+  <tr>
+    <td align="center" style="border-top: 0;">Inflearn</td>
+    <td align="center" style="border-top: 0;">EBSi</td>
+    <td align="center" style="border-top: 0;">EBS 중학</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://www.kmooc.kr/"><img src="./assets/icons/kmooc_logo.svg" width="104" alt="K-MOOC"></a></td>
     <td align="center"></td>
     <td align="center"></td>
+  </tr>
+  <tr>
+    <td align="center" style="border-top: 0;">K-MOOC</td>
+    <td align="center" style="border-top: 0;"></td>
+    <td align="center" style="border-top: 0;"></td>
   </tr>
 </table>
 
