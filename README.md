@@ -19,17 +19,17 @@ Time   15:00
 
 <table align="center">
   <tr>
-    <td align="center"><a href="https://www.youtube.com/"><img src="https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32" width="16" height="16" alt=""> YouTube</a></td>
-    <td align="center"><a href="https://vimeo.com/"><img src="https://www.google.com/s2/favicons?domain=vimeo.com&sz=32" width="16" height="16" alt=""> Vimeo</a></td>
-    <td align="center"><a href="https://www.udemy.com/"><img src="https://www.google.com/s2/favicons?domain=www.udemy.com&sz=32" width="16" height="16" alt=""> Udemy</a></td>
+    <td align="center"><a href="https://www.youtube.com/"><img src="https://www.gstatic.com/marketing-cms/assets/images/08/25/fffdc76145f28be3a1ca63859c4a/external-logo-core-1.png%3Dn-w1860-h1047-fcrop64%3D1%2C00000000ffffffff-rw" width="82" alt="YouTube"></a></td>
+    <td align="center"><a href="https://vimeo.com/"><img src="./assets/icons/vimeo_logo.svg" width="82" alt="Vimeo"></a></td>
+    <td align="center"><a href="https://www.udemy.com/"><img src="./assets/icons/udemy.log.svg" width="82" alt="Udemy"></a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://www.inflearn.com/"><img src="https://www.google.com/s2/favicons?domain=www.inflearn.com&sz=32" width="16" height="16" alt=""> Inflearn</a></td>
-    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="https://www.google.com/s2/favicons?domain=www.ebsi.co.kr&sz=32" width="16" height="16" alt=""> EBSi</a></td>
-    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="https://www.google.com/s2/favicons?domain=mid.ebs.co.kr&sz=32" width="16" height="16" alt=""> EBS 중학</a></td>
+    <td align="center"><a href="https://www.inflearn.com/"><img src="./assets/icons/inflearn_logo.svg" width="82" alt="Inflearn"></a></td>
+    <td align="center"><a href="https://www.ebsi.co.kr/"><img src="./assets/icons/ebsi_logo.svg" width="82" alt="EBSi"></a></td>
+    <td align="center"><a href="https://mid.ebs.co.kr/"><img src="./assets/icons/ebsMid_logo.svg" width="82" alt="EBS 중학"></a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://www.kmooc.kr/"><img src="https://www.google.com/s2/favicons?domain=www.kmooc.kr&sz=32" width="16" height="16" alt=""> K-MOOC</a></td>
+    <td align="center"><a href="https://www.kmooc.kr/"><img src="./assets/icons/kmooc_logo.svg" width="82" alt="K-MOOC"></a></td>
     <td align="center"></td>
     <td align="center"></td>
   </tr>
