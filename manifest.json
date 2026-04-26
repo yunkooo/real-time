@@ -3,9 +3,21 @@
   "name": "Realtime",
   "description": "Shows real remaining time based on the current video playback speed.",
   "version": "0.1.0",
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Realtime"
+    "default_title": "Realtime",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png",
+      "128": "assets/icons/icon-128.png"
+    }
   },
   "permissions": ["storage"],
   "content_scripts": [
