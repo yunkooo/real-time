@@ -19,7 +19,17 @@
       });
     }
 
+    function pruneDisconnectedPromotedElements() {
+      promotedElements.forEach((_style, element) => {
+        if (!element.isConnected) {
+          promotedElements.delete(element);
+        }
+      });
+    }
+
     function promoteElement(element) {
+      pruneDisconnectedPromotedElements();
+
       if (!element) {
         return;
       }
