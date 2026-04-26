@@ -17,27 +17,25 @@ Time   15:00
 
 ## 현재 지원 사이트
 
-- YouTube
-- Vimeo
-- Udemy
-- Inflearn
-- EBSi
-- EBS 중학
-- K-MOOC
+| 사이트 | 사이트 | 사이트 |
+| ------ | ------ | ------ |
+| <a href="https://www.youtube.com/"><img src="https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32" width="16" height="16" alt=""> YouTube</a> | <a href="https://vimeo.com/"><img src="https://www.google.com/s2/favicons?domain=vimeo.com&sz=32" width="16" height="16" alt=""> Vimeo</a> | <a href="https://www.udemy.com/"><img src="https://www.google.com/s2/favicons?domain=www.udemy.com&sz=32" width="16" height="16" alt=""> Udemy</a> |
+| <a href="https://www.inflearn.com/"><img src="https://www.google.com/s2/favicons?domain=www.inflearn.com&sz=32" width="16" height="16" alt=""> Inflearn</a> | <a href="https://www.ebsi.co.kr/"><img src="https://www.google.com/s2/favicons?domain=www.ebsi.co.kr&sz=32" width="16" height="16" alt=""> EBSi</a> | <a href="https://mid.ebs.co.kr/"><img src="https://www.google.com/s2/favicons?domain=mid.ebs.co.kr&sz=32" width="16" height="16" alt=""> EBS 중학</a> |
+| <a href="https://www.kmooc.kr/"><img src="https://www.google.com/s2/favicons?domain=www.kmooc.kr&sz=32" width="16" height="16" alt=""> K-MOOC</a> |  |  |
 
 ## 지원 구조
 
 Real-time은 사이트별로 정해진 위치에 마우스를 올렸을 때 box를 표시합니다. 해당 위치를 찾지 못하거나 마우스를 올려도 표시할 수 없는 상태라면 현재 재생 중인 `video`를 기준으로 좌측 상단에 항상 표시합니다.
 
-| 사이트   | 기본 표시 조건      | fallback                 |
-| -------- | ------------------- | ------------------------ |
-| YouTube  | 시간 표시 위치      | 영상 좌측 상단 always-on |
-| Vimeo    | 동영상 진행 바      | 영상 좌측 상단 always-on |
-| Udemy    | 시간 표시 위치      | 영상 좌측 상단 always-on |
-| Inflearn | 동영상 진행 바      | 영상 좌측 상단 always-on |
-| EBSi     | 배속 설정 박스      | 영상 좌측 상단 always-on |
-| EBS 중학 | 배속 표시 위치      | 영상 좌측 상단 always-on |
-| K-MOOC   | 종료 시간 표시 위치 | 영상 좌측 상단 always-on |
+| 사이트   | 기본 표시 조건                    | fallback                 |
+| -------- | --------------------------------- | ------------------------ |
+| YouTube  | 시간 표시 위치                    | 영상 좌측 상단 always-on |
+| Vimeo    | 동영상 진행 바                    | 영상 좌측 상단 always-on |
+| Udemy    | 시간 표시 위치                    | 영상 좌측 상단 always-on |
+| Inflearn | 동영상 진행 바                    | 영상 좌측 상단 always-on |
+| EBSi     | 배속 설정 박스                    | 영상 좌측 상단 always-on |
+| EBS 중학 | 배속 표시 위치                    | 영상 좌측 상단 always-on |
+| K-MOOC   | 영상 프레임 안에서 마우스 움직임 | 영상 좌측 상단 always-on |
 
 ## 주요 기능
 
