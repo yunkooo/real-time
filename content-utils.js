@@ -16,6 +16,7 @@
    * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findTrigger]
    * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findPointerActivityTarget]
    * @property {number} [pointerActivityHideDelayMs]
+   * @property {boolean} [fallbackOnUnusableTrigger]
    * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
    * @property {(video: HTMLVideoElement | null) => number | null} [getRemainingSeconds]

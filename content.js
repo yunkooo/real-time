@@ -381,7 +381,11 @@
 
     if (!isTriggerUsable(adapter, trigger)) {
       removeTriggerListeners?.();
-      showFallbackPanel(video, adapter);
+      if (adapter.fallbackOnUnusableTrigger === false) {
+        hidePanelWithMode();
+      } else {
+        showFallbackPanel(video, adapter);
+      }
       return;
     }
 

@@ -42,6 +42,7 @@
       findTrigger() {
         return findShakaSeekBarContainer();
       },
+      fallbackOnUnusableTrigger: false,
       isTriggerVisible: isHoverableElement
     });
   }
