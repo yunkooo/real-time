@@ -6,18 +6,13 @@
   function createInflearnAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
 
-    function findShakaSeekBarContainer() {
-      const seekBarContainer =
-        document.querySelector(".shaka-range-container.shaka-seek-bar-container") ||
-        document.querySelector("#player-container .shaka-seek-bar-container") ||
-        document.querySelector(".shaka-seek-bar-container");
-
-      if (seekBarContainer) {
-        return seekBarContainer;
-      }
-
-      const seekBar = document.querySelector("input.shaka-seek-bar");
-      return seekBar?.closest(".shaka-range-container") || seekBar;
+    function findTimerButton() {
+      const timerButtons = [...document.querySelectorAll("button.timer")];
+      return (
+        timerButtons.find((button) => button.querySelector('svg[data-icon="timer"]')) ||
+        timerButtons[0] ||
+        null
+      );
     }
 
     function isHoverableElement(element) {
@@ -40,7 +35,7 @@
     return createVideoAdapter({
       isSupportedPage,
       findTrigger() {
-        return findShakaSeekBarContainer();
+        return findTimerButton();
       },
       fallbackOnUnusableTrigger: false,
       isTriggerVisible: isHoverableElement
