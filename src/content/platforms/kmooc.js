@@ -83,5 +83,17 @@
     });
   }
 
-  Realtime.adapters.createKmoocAdapter = createKmoocAdapter;
+  Realtime.adapters.registerPlatform({
+    name: "kmooc",
+    isMatch({ host }) {
+      return host === "lms.kmooc.kr";
+    },
+    create() {
+      return createKmoocAdapter({
+        isSupportedPage() {
+          return window.location.pathname === "/mod/vod/viewer.php";
+        }
+      });
+    }
+  });
 })();

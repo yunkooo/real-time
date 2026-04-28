@@ -43,5 +43,13 @@
     }, { getFallbackRect });
   }
 
-  Realtime.adapters.createVimeoAdapter = createVimeoAdapter;
+  Realtime.adapters.registerPlatform({
+    name: "vimeo",
+    isMatch({ host }) {
+      return host === "vimeo.com" || host.endsWith(".vimeo.com");
+    },
+    create() {
+      return createVimeoAdapter();
+    }
+  });
 })();

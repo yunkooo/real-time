@@ -24,6 +24,15 @@
    * @property {() => void} [cleanup]
    */
 
+  /**
+   * @typedef {Object} PlatformRegistration
+   * @property {string} name
+   * @property {(location: { host: string, pathname: string }) => boolean} isMatch
+   * @property {(location: { host: string, pathname: string }) => VideoAdapter} create
+   */
+
+  const registeredPlatforms = [];
+
   function formatDuration(totalSeconds) {
     if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
       return "--:--";
@@ -215,6 +224,24 @@
   };
 
   Realtime.adapters = Realtime.adapters || {};
+
+  Realtime.adapters.registerPlatform = function registerPlatform(platform) {
+    if (!platform?.name || typeof platform.isMatch !== "function" || typeof platform.create !== "function") {
+      return;
+    }
+
+    registeredPlatforms.push(platform);
+  };
+
+  Realtime.adapters.createAdapterForCurrentPage = function createAdapterForCurrentPage() {
+    const location = {
+      host: window.location.hostname,
+      pathname: window.location.pathname
+    };
+    const platform = registeredPlatforms.find((candidate) => candidate.isMatch(location));
+    return platform?.create(location) || null;
+  };
+
   Realtime.adapters.createVideoAdapter = function createVideoAdapter(overrides = {}, options = {}) {
     return {
       findVideo: findActiveVideo,
