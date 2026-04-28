@@ -43,5 +43,21 @@
     });
   }
 
-  Realtime.adapters.createYouTubeAdapter = createYouTubeAdapter;
+  Realtime.adapters.registerPlatform({
+    name: "youtube",
+    isMatch({ host }) {
+      return host === "www.youtube.com" || host === "youtube.com" || host.endsWith(".youtube.com");
+    },
+    create() {
+      return createYouTubeAdapter({
+        isSupportedPage() {
+          return (
+            window.location.pathname === "/watch" ||
+            window.location.pathname.startsWith("/embed/") ||
+            window.location.pathname.startsWith("/shorts/")
+          );
+        }
+      });
+    }
+  });
 })();

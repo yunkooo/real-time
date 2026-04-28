@@ -28,5 +28,17 @@
     });
   }
 
-  Realtime.adapters.createUdemyAdapter = createUdemyAdapter;
+  Realtime.adapters.registerPlatform({
+    name: "udemy",
+    isMatch({ host }) {
+      return host === "udemy.com" || host.endsWith(".udemy.com");
+    },
+    create() {
+      return createUdemyAdapter({
+        isSupportedPage() {
+          return window.location.pathname.includes("/learn/");
+        }
+      });
+    }
+  });
 })();

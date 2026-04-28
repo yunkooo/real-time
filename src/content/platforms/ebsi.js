@@ -47,5 +47,31 @@
     });
   }
 
-  Realtime.adapters.createEbsiAdapter = createEbsiAdapter;
+  Realtime.adapters.registerPlatform({
+    name: "ebsi",
+    isMatch({ host }) {
+      return host === "www.ebsi.co.kr" || host === "ebsi.co.kr" || host.endsWith(".ebsi.co.kr");
+    },
+    create() {
+      return createEbsiAdapter({
+        isSupportedPage() {
+          return window.location.pathname === "/ebs/lms/player/retrieveLmsPlayerHtml5.ebs";
+        }
+      });
+    }
+  });
+
+  Realtime.adapters.registerPlatform({
+    name: "ebs-mid",
+    isMatch({ host }) {
+      return host === "mid.ebs.co.kr";
+    },
+    create() {
+      return createEbsiAdapter({
+        isSupportedPage() {
+          return window.location.pathname === "/pleasure/course/plain/player/main/index";
+        }
+      });
+    }
+  });
 })();

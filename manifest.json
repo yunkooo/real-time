@@ -10,7 +10,7 @@
     "128": "assets/icons/icon_128.png"
   },
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/index.html",
     "default_title": "Realtime",
     "default_icon": {
       "16": "assets/icons/icon_16.png",
@@ -36,17 +36,17 @@
         "https://lms.kmooc.kr/*"
       ],
       "js": [
-        "content-utils.js",
-        "content-panel.js",
-        "platforms/youtube.js",
-        "platforms/vimeo.js",
-        "platforms/udemy.js",
-        "platforms/inflearn.js",
-        "platforms/ebsi.js",
-        "platforms/kmooc.js",
-        "content.js"
+        "src/content/utils.js",
+        "src/content/panel.js",
+        "src/content/platforms/youtube.js",
+        "src/content/platforms/vimeo.js",
+        "src/content/platforms/udemy.js",
+        "src/content/platforms/inflearn.js",
+        "src/content/platforms/ebsi.js",
+        "src/content/platforms/kmooc.js",
+        "src/content/main.js"
       ],
-      "css": ["styles.css"],
+      "css": ["src/content/styles.css"],
       "all_frames": true,
       "run_at": "document_idle"
     }

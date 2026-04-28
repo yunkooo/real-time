@@ -7,14 +7,6 @@
     STORAGE_KEY,
     UPDATE_INTERVAL_MS
   } = Realtime.constants;
-  const {
-    createEbsiAdapter,
-    createInflearnAdapter,
-    createKmoocAdapter,
-    createUdemyAdapter,
-    createYouTubeAdapter,
-    createVimeoAdapter
-  } = Realtime.adapters;
   const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = Realtime.panel;
   const { getVideoRate, isUsableVideo } = Realtime.video;
 
@@ -527,64 +519,7 @@
   }
 
   function createAdapter() {
-    const host = window.location.hostname;
-    if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
-      return createVimeoAdapter();
-    }
-
-    if (host === "www.youtube.com" || host === "youtube.com" || host.endsWith(".youtube.com")) {
-      return createYouTubeAdapter({
-        isSupportedPage() {
-          return (
-            window.location.pathname === "/watch" ||
-            window.location.pathname.startsWith("/embed/") ||
-            window.location.pathname.startsWith("/shorts/")
-          );
-        }
-      });
-    }
-
-    if (host === "udemy.com" || host.endsWith(".udemy.com")) {
-      return createUdemyAdapter({
-        isSupportedPage() {
-          return window.location.pathname.includes("/learn/");
-        }
-      });
-    }
-
-    if (host === "inflearn.com" || host.endsWith(".inflearn.com")) {
-      return createInflearnAdapter({
-        isSupportedPage() {
-          return window.location.pathname.includes("/lecture/") || window.location.pathname.startsWith("/courses/lecture");
-        }
-      });
-    }
-
-    if (host === "www.ebsi.co.kr" || host === "ebsi.co.kr" || host.endsWith(".ebsi.co.kr")) {
-      return createEbsiAdapter({
-        isSupportedPage() {
-          return window.location.pathname === "/ebs/lms/player/retrieveLmsPlayerHtml5.ebs";
-        }
-      });
-    }
-
-    if (host === "mid.ebs.co.kr") {
-      return createEbsiAdapter({
-        isSupportedPage() {
-          return window.location.pathname === "/pleasure/course/plain/player/main/index";
-        }
-      });
-    }
-
-    if (host === "lms.kmooc.kr") {
-      return createKmoocAdapter({
-        isSupportedPage() {
-          return window.location.pathname === "/mod/vod/viewer.php";
-        }
-      });
-    }
-
-    return null;
+    return Realtime.adapters.createAdapterForCurrentPage();
   }
 
   async function init() {

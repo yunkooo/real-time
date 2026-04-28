@@ -42,5 +42,17 @@
     });
   }
 
-  Realtime.adapters.createInflearnAdapter = createInflearnAdapter;
+  Realtime.adapters.registerPlatform({
+    name: "inflearn",
+    isMatch({ host }) {
+      return host === "inflearn.com" || host.endsWith(".inflearn.com");
+    },
+    create() {
+      return createInflearnAdapter({
+        isSupportedPage() {
+          return window.location.pathname.includes("/lecture/") || window.location.pathname.startsWith("/courses/lecture");
+        }
+      });
+    }
+  });
 })();
