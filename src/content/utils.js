@@ -15,6 +15,7 @@
    * @property {() => boolean} [isSupportedPage]
    * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findTrigger]
    * @property {(video: HTMLVideoElement | null) => HTMLElement | null} [findPointerActivityTarget]
+   * @property {"hover" | "pointer-activity"} [interactionMode]
    * @property {number} [pointerActivityHideDelayMs]
    * @property {boolean} [fallbackOnUnusableTrigger]
    * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
@@ -243,8 +244,11 @@
   };
 
   Realtime.adapters.createVideoAdapter = function createVideoAdapter(overrides = {}, options = {}) {
+    const interactionMode = overrides.interactionMode || (overrides.findPointerActivityTarget ? "pointer-activity" : "hover");
+
     return {
       findVideo: findActiveVideo,
+      interactionMode,
       getPlaybackRate: getVideoRate,
       getPanelPosition(video, panel) {
         return getVideoTopLeftPanelPosition(video, panel, options.getFallbackRect);
