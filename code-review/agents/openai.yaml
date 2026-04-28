@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "실무형 코드 리뷰 체크리스트"
+  default_prompt: "Use $code-review from this project's code-review/SKILL.md to review current code changes and report actionable findings first."
