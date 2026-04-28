@@ -70,6 +70,7 @@
 
     return createVideoAdapter({
       isSupportedPage,
+      interactionMode: "pointer-activity",
       findPointerActivityTarget,
       pointerActivityHideDelayMs: 1000,
       cleanup() {
