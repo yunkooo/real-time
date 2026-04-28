@@ -6,13 +6,14 @@ const vm = require("node:vm");
 
 const rootDir = path.resolve(__dirname, "..");
 
-function loadMainRuntime() {
+function loadMainRuntime(overrides = {}) {
   const source = fs.readFileSync(path.join(rootDir, "src/content/main.js"), "utf8");
   const calls = {
+    contentModels: [],
     intervalDelays: [],
     observedOptions: []
   };
-  const adapter = {
+  const adapter = overrides.adapter || {
     findVideo() {
       return null;
     }
@@ -33,15 +34,19 @@ function loadMainRuntime() {
         hidePanel() {},
         positionPanel() {},
         removePanel() {},
-        setPanelContent() {}
+        setPanelContent(_panel, model) {
+          calls.contentModels.push(model);
+        }
       },
       video: {
         getVideoRate() {
           return 1;
         },
-        isUsableVideo() {
-          return false;
-        }
+        isUsableVideo:
+          overrides.isUsableVideo ||
+          function isUsableVideo() {
+            return false;
+          }
       },
       adapters: {
         createAdapterForCurrentPage() {
@@ -114,4 +119,34 @@ test("content runtime starts without a polling interval or attribute observer", 
   assert.equal(calls.observedOptions[0].options.subtree, true);
   assert.equal(Object.hasOwn(calls.observedOptions[0].options, "attributes"), false);
   assert.equal(Object.hasOwn(calls.observedOptions[0].options, "attributeFilter"), false);
+});
+
+test("content runtime accepts adapter remaining seconds for infinite duration videos", async () => {
+  const liveVideo = {
+    currentTime: 1180,
+    duration: Infinity,
+    addEventListener() {},
+    removeEventListener() {}
+  };
+  const adapter = {
+    findTrigger() {
+      return null;
+    },
+    findVideo() {
+      return liveVideo;
+    },
+    getRemainingSeconds() {
+      return 20;
+    }
+  };
+  const { calls } = loadMainRuntime({
+    adapter,
+    isUsableVideo() {
+      return false;
+    }
+  });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.ok(calls.contentModels.some((model) => model.realRemaining === 20));
 });

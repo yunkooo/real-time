@@ -61,16 +61,27 @@
   }
 
   function getTimeModel(video, adapter) {
-    if (!isUsableVideo(video)) {
+    if (!video) {
       return null;
     }
 
-    const rate = getPlaybackRate(video, adapter);
     const adapterRemaining = adapter.getRemainingSeconds?.(video);
     if (adapterRemaining === null) {
       return null;
     }
 
+    if (adapterRemaining === undefined && !isUsableVideo(video)) {
+      return null;
+    }
+
+    if (
+      adapterRemaining !== undefined &&
+      (!Number.isFinite(adapterRemaining) || adapterRemaining < 0)
+    ) {
+      return null;
+    }
+
+    const rate = getPlaybackRate(video, adapter);
     const remaining = adapterRemaining ?? Math.max(video.duration - video.currentTime, 0);
 
     return {
