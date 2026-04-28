@@ -61,7 +61,10 @@
 
   function findActiveVideo() {
     const videos = [...document.querySelectorAll("video")];
+    const visibleVideos = videos.filter(isVisibleElement);
     return (
+      visibleVideos.find((video) => !video.paused && video.readyState > 0) ||
+      visibleVideos.find((video) => video.readyState > 0) ||
       videos.find((video) => !video.paused && video.readyState > 0) ||
       videos.find((video) => video.readyState > 0) ||
       null
