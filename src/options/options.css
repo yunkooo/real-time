@@ -3,28 +3,36 @@
 }
 
 body {
+  --rt-card-shadow: 0 14px 34px rgba(18, 24, 38, 0.06);
+  --rt-control-shadow: 0 8px 22px rgba(18, 24, 38, 0.07);
   background: var(--rt-background);
   color: var(--rt-text);
+  line-height: 1.5;
   margin: 0;
   min-height: 100vh;
 }
 
 .options-page {
   margin: 0 auto;
-  max-width: 720px;
-  padding: 56px 24px;
+  max-width: 760px;
+  padding: 44px 24px 64px;
 }
 
 .page-header {
+  align-items: center;
   border-bottom: 1px solid var(--rt-border);
-  padding-bottom: 28px;
+  display: flex;
+  gap: 20px;
+  padding-bottom: 22px;
 }
 
-.eyebrow {
-  color: var(--rt-switch-on);
-  font-size: 13px;
-  font-weight: 700;
-  margin: 0 0 8px;
+.app-icon {
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(18, 24, 38, 0.14);
+  display: block;
+  flex: 0 0 auto;
+  height: 64px;
+  width: 64px;
 }
 
 h1,
@@ -34,19 +42,16 @@ p {
 }
 
 h1 {
-  font-size: 36px;
+  font-size: clamp(30px, 5vw, 40px);
+  font-weight: 800;
+  letter-spacing: 0;
   line-height: 1.1;
 }
 
-.description {
-  color: var(--rt-muted);
-  font-size: 15px;
-  line-height: 1.6;
-  margin-top: 12px;
-}
-
 .settings {
-  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
 }
 
 .setting-row {
@@ -54,14 +59,22 @@ h1 {
   background: var(--rt-surface);
   border: 1px solid var(--rt-border);
   border-radius: 8px;
+  box-shadow: var(--rt-card-shadow);
   display: flex;
   gap: 24px;
   justify-content: space-between;
-  padding: 20px;
+  padding: 20px 22px;
 }
 
-.setting-row h2 {
+.setting-row > div:first-child {
+  min-width: 0;
+}
+
+.setting-row h2,
+.setting-row legend {
+  color: var(--rt-text);
   font-size: 16px;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -70,6 +83,15 @@ h1 {
   font-size: 14px;
   line-height: 1.5;
   margin-top: 6px;
+  max-width: 470px;
+}
+
+.position-setting {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 22px;
+  margin: 0;
+  padding-bottom: 24px;
 }
 
 .switch-control {
@@ -77,28 +99,311 @@ h1 {
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
-  gap: 10px;
+  --rt-switch-height: 28px;
+  --rt-switch-knob-size: 24px;
+  --rt-switch-translate: 20px;
+  --rt-switch-width: 48px;
   user-select: none;
 }
 
-.status {
-  color: var(--rt-muted);
-  font-size: 13px;
-  font-weight: 700;
-  min-width: 20px;
+.select-control select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--rt-muted) 50%) right 15px center / 6px 6px no-repeat,
+    linear-gradient(135deg, var(--rt-muted) 50%, transparent 50%) right 10px center / 6px 6px no-repeat,
+    var(--rt-surface);
+  border: 1px solid var(--rt-border);
+  border-radius: 8px;
+  box-shadow: var(--rt-control-shadow);
+  color: var(--rt-text);
+  cursor: pointer;
+  font: inherit;
+  min-height: 44px;
+  min-width: 168px;
+  padding: 10px 38px 10px 14px;
+}
+
+.select-control select:focus-visible {
+  box-shadow: 0 0 0 3px var(--rt-focus-shadow);
+  outline: 0;
+}
+
+.position-grid {
+  --rt-position-accent: #ff1744;
+  --rt-position-accent-shadow: rgba(255, 23, 68, 0.18);
+  --rt-position-frame: #050609;
+  --rt-position-preview: #f0f3f8;
+  --rt-position-selected: var(--rt-switch-on);
+  --rt-position-selected-shadow: rgba(37, 99, 235, 0.16);
+  --rt-position-selected-soft: rgba(37, 99, 235, 0.08);
+  align-self: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(86px, 1fr));
+  max-width: 390px;
+  width: 100%;
+}
+
+.position-option {
+  align-items: center;
+  border: 1px solid var(--rt-border);
+  border-radius: 8px;
+  background: var(--rt-surface);
+  box-shadow: 0 8px 20px rgba(18, 24, 38, 0.05);
+  color: var(--rt-text);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  min-height: 86px;
+  padding: 10px;
+  position: relative;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+  user-select: none;
+}
+
+.position-option:hover {
+  background: var(--rt-surface-hover);
+  transform: translateY(-1px);
+}
+
+.position-option:has(input:checked) {
+  background: var(--rt-position-selected-soft);
+  border-color: var(--rt-position-selected);
+  box-shadow: 0 0 0 2px var(--rt-position-selected), 0 14px 28px var(--rt-position-selected-shadow);
+}
+
+.position-option:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px var(--rt-focus-shadow);
+}
+
+.position-option input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.position-preview {
+  align-items: center;
+  background: var(--rt-position-preview);
+  border-radius: 8px;
+  display: flex;
+  height: 58px;
+  justify-content: center;
+  width: 100%;
+}
+
+.position-frame {
+  background: var(--rt-position-frame);
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  display: block;
+  height: 36px;
+  position: relative;
+  width: 36px;
+}
+
+.position-marker {
+  background: var(--rt-position-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--rt-position-accent-shadow);
+  display: block;
+  height: 9px;
+  position: absolute;
+  width: 9px;
+}
+
+.position-option:has(input[value="top-left"]) .position-marker {
+  left: 6px;
+  top: 6px;
+}
+
+.position-option:has(input[value="top-center"]) .position-marker {
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+}
+
+.position-option:has(input[value="top-right"]) .position-marker {
+  right: 6px;
+  top: 6px;
+}
+
+.position-option:has(input[value="center-left"]) .position-marker {
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.position-option:has(input[value="center-center"]) .position-marker {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.position-option:has(input[value="center-right"]) .position-marker {
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.position-option:has(input[value="bottom-left"]) .position-marker {
+  bottom: 6px;
+  left: 6px;
+}
+
+.position-option:has(input[value="bottom-center"]) .position-marker {
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.position-option:has(input[value="bottom-right"]) .position-marker {
+  bottom: 6px;
+  right: 6px;
 }
 
 .switch-control:has(input:focus-visible) .switch {
   box-shadow: 0 0 0 3px var(--rt-focus-shadow);
 }
 
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 @media (max-width: 520px) {
   .options-page {
-    padding: 40px 18px;
+    padding: 34px 18px 48px;
+  }
+
+  .page-header {
+    gap: 14px;
+    padding-bottom: 20px;
+  }
+
+  .app-icon {
+    border-radius: 13px;
+    height: 52px;
+    width: 52px;
   }
 
   .setting-row {
     align-items: flex-start;
     flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .select-control,
+  .select-control select,
+  .position-grid {
+    max-width: none;
+    width: 100%;
+  }
+
+  .position-grid {
+    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .position-option {
+    min-height: 72px;
+    padding: 8px;
+  }
+
+  .position-preview {
+    height: 48px;
+  }
+
+  .position-frame {
+    border-radius: 6px;
+    height: 30px;
+    width: 30px;
+  }
+
+  .position-marker {
+    height: 8px;
+    width: 8px;
+  }
+
+  .position-option:has(input[value="top-left"]) .position-marker,
+  .position-option:has(input[value="center-left"]) .position-marker,
+  .position-option:has(input[value="bottom-left"]) .position-marker {
+    left: 5px;
+  }
+
+  .position-option:has(input[value="top-right"]) .position-marker,
+  .position-option:has(input[value="center-right"]) .position-marker,
+  .position-option:has(input[value="bottom-right"]) .position-marker {
+    right: 5px;
+  }
+
+  .position-option:has(input[value="top-left"]) .position-marker,
+  .position-option:has(input[value="top-center"]) .position-marker,
+  .position-option:has(input[value="top-right"]) .position-marker {
+    top: 5px;
+  }
+
+  .position-option:has(input[value="bottom-left"]) .position-marker,
+  .position-option:has(input[value="bottom-center"]) .position-marker,
+  .position-option:has(input[value="bottom-right"]) .position-marker {
+    bottom: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .position-option {
+    transition: none;
+  }
+
+  .position-option:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --rt-card-shadow: 0 16px 32px rgba(0, 0, 0, 0.24);
+    --rt-control-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  }
+
+  .position-grid {
+    --rt-position-accent: #ff4f73;
+    --rt-position-accent-shadow: rgba(255, 79, 115, 0.28);
+    --rt-position-frame: #05070d;
+    --rt-position-preview: #2c3442;
+    --rt-position-selected: #60a5fa;
+    --rt-position-selected-shadow: rgba(96, 165, 250, 0.3);
+    --rt-position-selected-soft: rgba(96, 165, 250, 0.18);
+  }
+
+  .position-option {
+    background: #242b36;
+    border-color: #445066;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 24px rgba(0, 0, 0, 0.24);
+  }
+
+  .position-option:hover {
+    background: #2b3442;
+    border-color: #5b6881;
+  }
+
+  .position-option:has(input:checked) {
+    background: #1f3144;
+    border-color: var(--rt-position-selected);
+    box-shadow: 0 0 0 2px var(--rt-position-selected), 0 16px 32px var(--rt-position-selected-shadow);
+  }
+
+  .position-preview {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  .position-frame {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 5px 14px rgba(0, 0, 0, 0.4);
   }
 }

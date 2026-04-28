@@ -12,25 +12,128 @@
 <body>
   <main class="options-page">
     <header class="page-header">
-      <p class="eyebrow">Real Time</p>
-      <h1>Options</h1>
-      <p class="description">Control how Real Time appears on supported video platforms.</p>
+      <img class="app-icon" src="../../assets/icons/icon_128.png" alt="" aria-hidden="true">
+      <h1 data-i18n="pageTitle">Real Time Settings</h1>
     </header>
 
     <section class="settings" aria-label="Real Time settings">
       <div class="setting-row">
         <div>
-          <h2>Enable Real Time</h2>
-          <p>Show adjusted remaining time while watching videos.</p>
+          <h2 data-i18n="enableTitle">Enable Real Time</h2>
+          <p data-i18n="enableDescription">Show adjusted remaining time while watching videos.</p>
         </div>
         <label class="switch-control" for="enabled">
           <input id="enabled" class="switch-input" type="checkbox" role="switch">
           <span class="switch" aria-hidden="true"></span>
-          <span id="status" class="status">On</span>
         </label>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <h2 data-i18n="languageTitle">Language</h2>
+          <p data-i18n="languageDescription">Choose the language used on this options page.</p>
+        </div>
+        <label class="select-control" for="language">
+          <span class="visually-hidden" data-i18n="languageTitle">Language</span>
+          <select id="language">
+            <option value="en">English</option>
+            <option value="ko">한국어</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="setting-row position-setting" role="group" aria-labelledby="position-title">
+        <div>
+          <h2 id="position-title" data-i18n="positionTitle">Panel position</h2>
+          <p data-i18n="positionDescription">Choose where the panel appears inside the video frame.</p>
+        </div>
+        <div class="position-grid">
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="top-left" checked>
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionTopLeft">Top left</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="top-center">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionTopCenter">Top center</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="top-right">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionTopRight">Top right</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="center-left">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionCenterLeft">Center left</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="center-center">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionCenterCenter">Center</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="center-right">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionCenterRight">Center right</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="bottom-left">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionBottomLeft">Bottom left</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="bottom-center">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionBottomCenter">Bottom center</span>
+          </label>
+          <label class="position-option">
+            <input type="radio" name="panel-position" value="bottom-right">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-frame">
+                <span class="position-marker"></span>
+              </span>
+            </span>
+            <span class="visually-hidden" data-i18n="positionBottomRight">Bottom right</span>
+          </label>
+        </div>
       </div>
     </section>
   </main>
+  <script src="../shared/settings.js"></script>
   <script src="options.js"></script>
 </body>
 

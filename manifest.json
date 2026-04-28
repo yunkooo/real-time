@@ -37,6 +37,7 @@
         "https://lms.kmooc.kr/*"
       ],
       "js": [
+        "src/shared/settings.js",
         "src/content/utils.js",
         "src/content/panel.js",
         "src/content/platforms/youtube.js",

@@ -44,15 +44,15 @@
     `;
   }
 
-  function positionPanel(video, panel, adapter) {
-    const panelPosition = adapter.getPanelPosition?.(video, panel);
-    if (panelPosition) {
-      panel.style.left = `${panelPosition.left}px`;
-      panel.style.top = `${panelPosition.top}px`;
+  function positionPanel(video, panel, adapter, selectedPosition) {
+    const targetPosition = adapter.getPanelPosition?.(video, panel, selectedPosition);
+    if (targetPosition) {
+      panel.style.left = `${targetPosition.left}px`;
+      panel.style.top = `${targetPosition.top}px`;
       return;
     }
 
-    if (panelPosition === false || adapter.getPanelPosition) {
+    if (targetPosition === false || adapter.getPanelPosition) {
       hidePanel();
       return;
     }

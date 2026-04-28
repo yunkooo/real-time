@@ -1,5 +1,5 @@
-const STORAGE_KEY = "enabled";
-const DEFAULT_STATE = { [STORAGE_KEY]: true };
+const { DEFAULT_STATE, STORAGE_KEYS } = window.RealtimeSettings;
+const STORAGE_KEY = STORAGE_KEYS.ENABLED;
 
 const enabledInput = document.querySelector("#enabled");
 const optionsButton = document.querySelector("#open-options");

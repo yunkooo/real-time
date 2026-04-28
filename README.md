@@ -161,5 +161,5 @@ Real Time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 
 ## 개인정보처리방침
 
 - Privacy Policy: https://yunkooo.github.io/real-time/privacy.html
-- Real Time은 popup의 on/off 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
+- Real Time은 on/off 상태, 설정 페이지 언어, 패널 위치 같은 표시 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
 - 영상의 현재 재생 시간, 전체 길이, 재생 배속은 실제 남은 시간을 계산하기 위해 브라우저 안에서만 읽고, 서버로 전송하거나 저장하지 않습니다.

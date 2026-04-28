@@ -17,7 +17,7 @@ function getHtmlAssetPaths(htmlPath) {
   const html = fs.readFileSync(path.join(rootDir, htmlPath), "utf8");
   const htmlDir = path.dirname(htmlPath);
   const assetPaths = [];
-  const assetPattern = /\b(?:href|src)="([^"]+\.(?:css|js))"/g;
+  const assetPattern = /\b(?:href|src)="([^"]+\.(?:css|js|png|svg))"/g;
 
   for (const match of html.matchAll(assetPattern)) {
     assetPaths.push(path.normalize(path.join(htmlDir, match[1])));

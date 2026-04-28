@@ -1,15 +1,22 @@
 (() => {
   const Realtime = window.Realtime;
   const {
+    DEFAULT_PANEL_POSITION = "top-left",
     DEFAULT_STATE,
     PANEL_ID,
+    PANEL_POSITION_KEY = "panelPosition",
+    PANEL_POSITIONS = [],
     RATE_CACHE_GRACE_MS,
     STORAGE_KEY
   } = Realtime.constants;
   const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = Realtime.panel;
   const { getVideoRate, isUsableVideo } = Realtime.video;
+  const normalizePanelPosition =
+    window.RealtimeSettings?.normalizePanelPosition ||
+    ((position) => (PANEL_POSITIONS?.includes(position) ? position : DEFAULT_PANEL_POSITION));
 
   let enabled = true;
+  let panelPosition = DEFAULT_PANEL_POSITION;
   let mutationObserver = null;
   let currentVideo = null;
   let triggerElement = null;
@@ -29,9 +36,11 @@
       .get(DEFAULT_STATE)
       .then((items) => {
         enabled = items[STORAGE_KEY] !== false;
+        panelPosition = normalizePanelPosition(items[PANEL_POSITION_KEY]);
       })
       .catch(() => {
         enabled = true;
+        panelPosition = DEFAULT_PANEL_POSITION;
       });
   }
 
@@ -105,7 +114,7 @@
     const panel = ensurePanel();
     setPanelContent(panel, model);
     panel.classList.add("realtime-panel-visible");
-    positionPanel(video, panel, adapter);
+    positionPanel(video, panel, adapter, panelPosition);
   }
 
   function showFallbackPanel(video, adapter) {
@@ -492,7 +501,26 @@
 
   function bindStorageChanges(adapter) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName !== "sync" || !Object.prototype.hasOwnProperty.call(changes, STORAGE_KEY)) {
+      if (areaName !== "sync") {
+        return;
+      }
+
+      const hasEnabledChange = Object.prototype.hasOwnProperty.call(changes, STORAGE_KEY);
+      const hasPanelPositionChange =
+        PANEL_POSITION_KEY && Object.prototype.hasOwnProperty.call(changes, PANEL_POSITION_KEY);
+
+      if (!hasEnabledChange && !hasPanelPositionChange) {
+        return;
+      }
+
+      if (hasPanelPositionChange) {
+        panelPosition = normalizePanelPosition(changes[PANEL_POSITION_KEY].newValue);
+      }
+
+      if (!hasEnabledChange) {
+        if (enabled && currentVideo?.isConnected) {
+          updateVisiblePanel(currentVideo, adapter);
+        }
         return;
       }
 

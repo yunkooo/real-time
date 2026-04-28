@@ -11,7 +11,9 @@ function loadMainRuntime(overrides = {}) {
   const calls = {
     contentModels: [],
     intervalDelays: [],
-    observedOptions: []
+    observedOptions: [],
+    panelPositions: [],
+    storageChangeListener: null
   };
   const adapter = overrides.adapter || {
     findVideo() {
@@ -21,8 +23,21 @@ function loadMainRuntime(overrides = {}) {
   const window = {
     Realtime: {
       constants: {
-        DEFAULT_STATE: { enabled: true },
+        DEFAULT_PANEL_POSITION: "top-left",
+        DEFAULT_STATE: { enabled: true, language: "en", panelPosition: "top-left" },
         PANEL_ID: "realtime-panel",
+        PANEL_POSITION_KEY: "panelPosition",
+        PANEL_POSITIONS: [
+          "top-left",
+          "top-right",
+          "bottom-left",
+          "bottom-right",
+          "top-center",
+          "bottom-center",
+          "center-left",
+          "center-center",
+          "center-right"
+        ],
         RATE_CACHE_GRACE_MS: 900,
         STORAGE_KEY: "enabled",
         UPDATE_INTERVAL_MS: 500
@@ -32,7 +47,9 @@ function loadMainRuntime(overrides = {}) {
           return { classList: { add() {} } };
         },
         hidePanel() {},
-        positionPanel() {},
+        positionPanel(_video, _panel, _adapter, panelPosition) {
+          calls.panelPositions.push(panelPosition);
+        },
         removePanel() {},
         setPanelContent(_panel, model) {
           calls.contentModels.push(model);
@@ -88,11 +105,16 @@ function loadMainRuntime(overrides = {}) {
     storage: {
       sync: {
         get() {
-          return Promise.resolve({ enabled: true });
+          return Promise.resolve({
+            enabled: true,
+            panelPosition: overrides.panelPosition || "top-left"
+          });
         }
       },
       onChanged: {
-        addListener() {}
+        addListener(listener) {
+          calls.storageChangeListener = listener;
+        }
       }
     }
   };
@@ -149,4 +171,69 @@ test("content runtime accepts adapter remaining seconds for infinite duration vi
   await new Promise((resolve) => setImmediate(resolve));
 
   assert.ok(calls.contentModels.some((model) => model.realRemaining === 20));
+});
+
+test("content runtime passes stored panel position to panel positioning", async () => {
+  const video = {
+    currentTime: 10,
+    duration: 70,
+    addEventListener() {},
+    removeEventListener() {}
+  };
+  const adapter = {
+    findTrigger() {
+      return null;
+    },
+    findVideo() {
+      return video;
+    }
+  };
+  const { calls } = loadMainRuntime({
+    adapter,
+    isUsableVideo() {
+      return true;
+    },
+    panelPosition: "bottom-right"
+  });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.ok(calls.panelPositions.includes("bottom-right"));
+});
+
+test("content runtime updates visible panel when panel position storage changes", async () => {
+  const video = {
+    currentTime: 10,
+    duration: 70,
+    isConnected: true,
+    addEventListener() {},
+    removeEventListener() {}
+  };
+  const adapter = {
+    findTrigger() {
+      return null;
+    },
+    findVideo() {
+      return video;
+    }
+  };
+  const { calls } = loadMainRuntime({
+    adapter,
+    isUsableVideo() {
+      return true;
+    }
+  });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  calls.storageChangeListener(
+    {
+      panelPosition: {
+        newValue: "center-right"
+      }
+    },
+    "sync"
+  );
+
+  assert.ok(calls.panelPositions.includes("center-right"));
 });

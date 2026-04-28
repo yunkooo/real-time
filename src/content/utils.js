@@ -1,10 +1,36 @@
 (() => {
   const Realtime = (window.Realtime = window.Realtime || {});
+  const settings = window.RealtimeSettings || {
+    DEFAULT_STATE: { enabled: true, language: "en", panelPosition: "top-left" },
+    PANEL_POSITIONS: [
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right",
+      "top-center",
+      "bottom-center",
+      "center-left",
+      "center-center",
+      "center-right"
+    ],
+    STORAGE_KEYS: {
+      ENABLED: "enabled",
+      LANGUAGE: "language",
+      PANEL_POSITION: "panelPosition"
+    },
+    normalizePanelPosition(position) {
+      return this.PANEL_POSITIONS.includes(position) ? position : this.DEFAULT_STATE.panelPosition;
+    }
+  };
 
   Realtime.constants = {
-    STORAGE_KEY: "enabled",
+    DEFAULT_PANEL_POSITION: settings.DEFAULT_STATE[settings.STORAGE_KEYS.PANEL_POSITION],
+    DEFAULT_STATE: settings.DEFAULT_STATE,
+    LANGUAGE_KEY: settings.STORAGE_KEYS.LANGUAGE,
     PANEL_ID: "realtime-panel",
-    DEFAULT_STATE: { enabled: true },
+    PANEL_POSITION_KEY: settings.STORAGE_KEYS.PANEL_POSITION,
+    PANEL_POSITIONS: settings.PANEL_POSITIONS,
+    STORAGE_KEY: settings.STORAGE_KEYS.ENABLED,
     UPDATE_INTERVAL_MS: 500,
     RATE_CACHE_GRACE_MS: 900
   };
@@ -21,7 +47,7 @@
    * @property {(trigger: HTMLElement) => boolean} [isTriggerVisible]
    * @property {(video: HTMLVideoElement | null) => number | null} [getPlaybackRate]
    * @property {(video: HTMLVideoElement | null) => number | null} [getRemainingSeconds]
-   * @property {(video: HTMLVideoElement | null, panel: HTMLElement) => { left: number, top: number } | false | null} [getPanelPosition]
+   * @property {(video: HTMLVideoElement | null, panel: HTMLElement, panelPosition: string) => { left: number, top: number } | false | null} [getPanelPosition]
    * @property {() => void} [cleanup]
    */
 
@@ -194,18 +220,81 @@
     return frameRect;
   }
 
-  function getVideoTopLeftPanelPosition(video, _panel, fallbackRect) {
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function getPanelSize(panel) {
+    const rect = panel?.getBoundingClientRect?.();
+    return {
+      height: rect?.height || 0,
+      width: rect?.width || 0
+    };
+  }
+
+  function getVideoPanelPosition(video, panel, fallbackRect, panelPosition) {
     const rect = getVisibleVideoFrameRect(video, fallbackRect);
     if (!rect) {
       return false;
     }
 
+    const position = settings.normalizePanelPosition(panelPosition);
+    const panelSize = getPanelSize(panel);
     const viewportPadding = 12;
     const inset = 16;
-    const left = Math.max(rect.left + inset, viewportPadding);
-    const top = Math.max(rect.top + inset, viewportPadding);
+    const centerLeft = rect.left + (rect.width - panelSize.width) / 2;
+    const centerTop = rect.top + (rect.height - panelSize.height) / 2;
+
+    const positions = {
+      "bottom-center": {
+        left: centerLeft,
+        top: rect.bottom - panelSize.height - inset
+      },
+      "bottom-left": {
+        left: rect.left + inset,
+        top: rect.bottom - panelSize.height - inset
+      },
+      "bottom-right": {
+        left: rect.right - panelSize.width - inset,
+        top: rect.bottom - panelSize.height - inset
+      },
+      "center-left": {
+        left: rect.left + inset,
+        top: centerTop
+      },
+      "center-center": {
+        left: centerLeft,
+        top: centerTop
+      },
+      "center-right": {
+        left: rect.right - panelSize.width - inset,
+        top: centerTop
+      },
+      "top-center": {
+        left: centerLeft,
+        top: rect.top + inset
+      },
+      "top-left": {
+        left: rect.left + inset,
+        top: rect.top + inset
+      },
+      "top-right": {
+        left: rect.right - panelSize.width - inset,
+        top: rect.top + inset
+      }
+    };
+
+    const target = positions[position] || positions["top-left"];
+    const maxLeft = Math.max(viewportPadding, window.innerWidth - panelSize.width - viewportPadding);
+    const maxTop = Math.max(viewportPadding, window.innerHeight - panelSize.height - viewportPadding);
+    const left = clamp(target.left, viewportPadding, maxLeft);
+    const top = clamp(target.top, viewportPadding, maxTop);
 
     return { left, top };
+  }
+
+  function getVideoTopLeftPanelPosition(video, panel, fallbackRect) {
+    return getVideoPanelPosition(video, panel, fallbackRect, "top-left");
   }
 
   Realtime.format = {
@@ -219,6 +308,7 @@
     isVisibleElement,
     isUsableVideo,
     getVideoRate,
+    getVideoPanelPosition,
     getVideoTopLeftPanelPosition
   };
 
@@ -253,8 +343,8 @@
       findVideo: findActiveVideo,
       interactionMode,
       getPlaybackRate: getVideoRate,
-      getPanelPosition(video, panel) {
-        return getVideoTopLeftPanelPosition(video, panel, options.getFallbackRect);
+      getPanelPosition(video, panel, panelPosition) {
+        return getVideoPanelPosition(video, panel, options.getFallbackRect, panelPosition);
       },
       ...overrides
     };
