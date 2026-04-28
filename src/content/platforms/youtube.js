@@ -3,7 +3,7 @@
   const { isVisibleElement } = Realtime.video;
   const { createVideoAdapter } = Realtime.adapters;
   const maxVideoRemainingSeconds = 12 * 60 * 60;
-  const liveRemainingOffsetSeconds = 58 * 60 + 30;
+  const liveRemainingOffsetSeconds = 59 * 60 + 30;
 
   function createYouTubeAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);

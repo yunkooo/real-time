@@ -6,7 +6,7 @@ const vm = require("node:vm");
 
 const rootDir = path.resolve(__dirname, "..");
 const maxVideoRemainingSeconds = toSeconds(12, 0, 0);
-const liveRemainingOffsetSeconds = toSeconds(0, 58, 30);
+const liveRemainingOffsetSeconds = toSeconds(0, 59, 30);
 
 function toSeconds(hours, minutes, seconds) {
   return hours * 60 * 60 + minutes * 60 + seconds;
@@ -102,7 +102,7 @@ test("youtube adapter subtracts live offset from duration before clamping to twe
 test("youtube adapter keeps live videos below twelve hours after offset", () => {
   const adapter = loadYouTubeAdapter({ live: true });
 
-  assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(12, 41, 52), currentTime: 0 }), toSeconds(11, 43, 22));
+  assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(12, 41, 52), currentTime: 0 }), toSeconds(11, 42, 22));
 });
 
 test("youtube adapter hides live time when offset consumes the remaining time", () => {
@@ -119,7 +119,13 @@ test("youtube adapter subtracts live offset from the seekable edge before compar
     seekable: createSeekable([0, 900], [950, 45010])
   };
 
-  assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 15 * 60);
+  assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 14 * 60);
+});
+
+test("youtube adapter corrects the observed live one minute drift", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+
+  assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(7, 24, 30), currentTime: 0 }), toSeconds(6, 25, 0));
 });
 
 test("youtube adapter subtracts live offset from seekable fallback", () => {
@@ -135,11 +141,10 @@ test("youtube adapter subtracts live offset from seekable fallback", () => {
 
 test("youtube adapter subtracts live offset from seekable before clamping to twelve hours", () => {
   const adapter = loadYouTubeAdapter({ live: true });
-  const liveOffset = 58 * 60 + 30;
   const video = {
     currentTime: 1000,
     duration: Infinity,
-    seekable: createSeekable([0, 1000 + 12 * 60 * 60 + liveOffset])
+    seekable: createSeekable([0, 1000 + 12 * 60 * 60 + liveRemainingOffsetSeconds])
   };
 
   assert.equal(adapter.getRemainingSeconds(video), 12 * 60 * 60);
@@ -156,7 +161,7 @@ test("youtube adapter handles YouTube day-style live time values after offsettin
     seekable: createSeekable([0, liveEdge])
   };
 
-  assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 42 * 60 + 55);
+  assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 41 * 60 + 55);
 });
 
 test("youtube adapter hides live time when seekable range is unavailable", () => {
