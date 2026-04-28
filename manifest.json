@@ -10,7 +10,7 @@
     "128": "assets/icons/icon_128.png"
   },
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/index.html",
     "default_title": "Realtime",
     "default_icon": {
       "16": "assets/icons/icon_16.png",
