@@ -5,7 +5,7 @@
 
   function createKmoocAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
-    const maxZIndex = 2147483647;
+    const controlZIndex = "3";
     const promotedElements = new Map();
 
     function rememberStyle(element) {
@@ -42,7 +42,7 @@
         element.style.position = "relative";
       }
 
-      element.style.zIndex = String(maxZIndex);
+      element.style.zIndex = controlZIndex;
       element.style.pointerEvents = "auto";
     }
 
@@ -60,10 +60,7 @@
         video ||
         null;
 
-      if (target) {
-        promoteElement(target.closest?.(".video-js") || target);
-        keepControlsInteractive();
-      }
+      keepControlsInteractive();
 
       return target;
     }
