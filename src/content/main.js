@@ -4,14 +4,12 @@
     DEFAULT_STATE,
     PANEL_ID,
     RATE_CACHE_GRACE_MS,
-    STORAGE_KEY,
-    UPDATE_INTERVAL_MS
+    STORAGE_KEY
   } = Realtime.constants;
   const { ensurePanel, hidePanel, positionPanel, removePanel, setPanelContent } = Realtime.panel;
   const { getVideoRate, isUsableVideo } = Realtime.video;
 
   let enabled = true;
-  let updateTimer = null;
   let mutationObserver = null;
   let currentVideo = null;
   let triggerElement = null;
@@ -63,16 +61,27 @@
   }
 
   function getTimeModel(video, adapter) {
-    if (!isUsableVideo(video)) {
+    if (!video) {
       return null;
     }
 
-    const rate = getPlaybackRate(video, adapter);
     const adapterRemaining = adapter.getRemainingSeconds?.(video);
     if (adapterRemaining === null) {
       return null;
     }
 
+    if (adapterRemaining === undefined && !isUsableVideo(video)) {
+      return null;
+    }
+
+    if (
+      adapterRemaining !== undefined &&
+      (!Number.isFinite(adapterRemaining) || adapterRemaining < 0)
+    ) {
+      return null;
+    }
+
+    const rate = getPlaybackRate(video, adapter);
     const remaining = adapterRemaining ?? Math.max(video.duration - video.currentTime, 0);
 
     return {
@@ -424,15 +433,10 @@
   function startUpdating(adapter) {
     stopUpdating();
     observePageChanges(adapter);
-    updateTimer = window.setInterval(() => updateUi(adapter), UPDATE_INTERVAL_MS);
     updateUi(adapter);
   }
 
   function stopUpdating() {
-    if (updateTimer) {
-      window.clearInterval(updateTimer);
-      updateTimer = null;
-    }
     if (pendingUpdateFrame !== null) {
       window.cancelAnimationFrame(pendingUpdateFrame);
       pendingUpdateFrame = null;
@@ -481,8 +485,6 @@
     });
 
     mutationObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class", "style"],
       childList: true,
       subtree: true
     });
