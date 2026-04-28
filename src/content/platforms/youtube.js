@@ -3,6 +3,7 @@
   const { isVisibleElement } = Realtime.video;
   const { createVideoAdapter } = Realtime.adapters;
   const maxVideoRemainingSeconds = 12 * 60 * 60;
+  const liveRemainingOffsetSeconds = 58 * 60 + 30;
 
   function createYouTubeAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
@@ -19,7 +20,17 @@
       return Math.min(seconds, maxVideoRemainingSeconds);
     }
 
-    function getLastSeekableEnd(video) {
+    function getDurationRemainingSeconds(video) {
+      const duration = Number(video?.duration);
+      const currentTime = Number(video?.currentTime);
+      if (!Number.isFinite(duration) || !Number.isFinite(currentTime)) {
+        return null;
+      }
+
+      return Math.max(duration - currentTime, 0);
+    }
+
+    function getSeekableRemainingSeconds(video) {
       const seekable = video?.seekable;
       if (!seekable || seekable.length <= 0) {
         return null;
@@ -27,26 +38,39 @@
 
       try {
         const end = Number(seekable.end(seekable.length - 1));
-        return Number.isFinite(end) ? end : null;
+        const currentTime = Number(video?.currentTime);
+        if (!Number.isFinite(end) || !Number.isFinite(currentTime)) {
+          return null;
+        }
+
+        const remaining = end - currentTime;
+        return remaining > 0 ? remaining : null;
       } catch (_error) {
         return null;
       }
     }
 
+    function getRawRemainingSeconds(video) {
+      return getDurationRemainingSeconds(video) ?? getSeekableRemainingSeconds(video);
+    }
+
     function getLiveRemainingSeconds(video) {
-      const liveEdge = getLastSeekableEnd(video);
-      const currentTime = Number(video?.currentTime);
-      if (liveEdge === null || !Number.isFinite(currentTime)) {
+      const rawRemaining = getRawRemainingSeconds(video);
+      if (rawRemaining === null) {
         return null;
       }
 
-      const remaining = liveEdge - currentTime;
-      return remaining > 0 ? clampRemainingSeconds(remaining) : null;
+      const adjustedRemaining = rawRemaining - liveRemainingOffsetSeconds;
+      return adjustedRemaining > 0 ? clampRemainingSeconds(adjustedRemaining) : null;
     }
 
     function getRemainingSeconds(video) {
-      const rawRemaining = Math.max(video.duration - video.currentTime, 0);
       if (!isLiveStream()) {
+        const rawRemaining = getDurationRemainingSeconds(video);
+        if (rawRemaining === null) {
+          return null;
+        }
+
         return clampRemainingSeconds(rawRemaining);
       }
 

@@ -5,6 +5,12 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 const rootDir = path.resolve(__dirname, "..");
+const maxVideoRemainingSeconds = toSeconds(12, 0, 0);
+const liveRemainingOffsetSeconds = toSeconds(0, 58, 30);
+
+function toSeconds(hours, minutes, seconds) {
+  return hours * 60 * 60 + minutes * 60 + seconds;
+}
 
 function createVisibleElement() {
   return {
@@ -81,12 +87,36 @@ test("youtube adapter keeps normal videos on duration minus current time", () =>
   assert.equal(adapter.getRemainingSeconds({ duration: 600, currentTime: 150 }), 450);
 });
 
-test("youtube adapter uses live seekable edge instead of a fixed offset", () => {
+test("youtube adapter clamps normal videos without live offset", () => {
+  const adapter = loadYouTubeAdapter();
+
+  assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(13, 4, 10), currentTime: 0 }), maxVideoRemainingSeconds);
+});
+
+test("youtube adapter subtracts live offset before clamping to twelve hours", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+
+  assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(13, 4, 10), currentTime: 0 }), maxVideoRemainingSeconds);
+});
+
+test("youtube adapter keeps live videos below twelve hours after offset", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+
+  assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(12, 41, 52), currentTime: 0 }), toSeconds(11, 43, 22));
+});
+
+test("youtube adapter hides live time when offset consumes the remaining time", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+
+  assert.equal(adapter.getRemainingSeconds({ duration: liveRemainingOffsetSeconds, currentTime: 0 }), null);
+});
+
+test("youtube adapter subtracts live offset from seekable fallback", () => {
   const adapter = loadYouTubeAdapter({ live: true });
   const video = {
     currentTime: 1180,
     duration: Infinity,
-    seekable: createSeekable([0, 900], [950, 1200])
+    seekable: createSeekable([0, 900], [950, 1180 + liveRemainingOffsetSeconds + 20])
   };
 
   assert.equal(adapter.getRemainingSeconds(video), 20);
