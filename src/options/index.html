@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Real Time Options</title>
+  <link rel="stylesheet" href="../shared/ui.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+  <main class="options-page">
+    <header class="page-header">
+      <p class="eyebrow">Real Time</p>
+      <h1>Options</h1>
+      <p class="description">Control how Real Time appears on supported video platforms.</p>
+    </header>
+
+    <section class="settings" aria-label="Real Time settings">
+      <div class="setting-row">
+        <div>
+          <h2>Enable Real Time</h2>
+          <p>Show adjusted remaining time while watching videos.</p>
+        </div>
+        <label class="switch-control" for="enabled">
+          <input id="enabled" class="switch-input" type="checkbox" role="switch">
+          <span class="switch" aria-hidden="true"></span>
+          <span id="status" class="status">On</span>
+        </label>
+      </div>
+    </section>
+  </main>
+  <script src="options.js"></script>
+</body>
+
+</html>
