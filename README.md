@@ -1,14 +1,14 @@
-# Real-time
+# Real Time
 
 <p align="center">
-  <img src="./assets/icons/icon.svg" alt="Real-time icon" width="144" height="144" />
+  <img src="./assets/icons/icon.svg" alt="Real Time icon" width="144" height="144" />
 </p>
 
 영상 플랫폼에서 현재 배속 기준으로 실제 남은 시간을 보여주는 Chrome 확장프로그램입니다.
 
 영상 플랫폼의 기본 시간 표시는 보통 원본 영상 시간을 기준으로 표시됩니다. 하지만 `1.5x`, `2x`처럼 배속을 바꿔서 보고 있다면 실제로 남은 시간은 더 짧습니다.
 
-Real-time은 현재 재생 배속을 반영해서 실제로 몇 분이 남았는지 영상 좌측 상단의 작은 box로 보여줍니다.
+Real Time은 현재 재생 배속을 반영해서 실제로 몇 분이 남았는지 영상 좌측 상단의 작은 box로 보여줍니다.
 
 ```text
 speed  2x
@@ -52,7 +52,7 @@ time   15:00
 
 ## 지원 구조
 
-Real-time은 사이트별로 정해진 위치에 마우스를 올렸을 때 box를 표시합니다. 해당 위치를 찾지 못하거나 마우스를 올려도 표시할 수 없는 상태라면 현재 재생 중인 `video`를 기준으로 좌측 상단에 항상 표시합니다.
+Real Time은 사이트별로 정해진 위치에 마우스를 올렸을 때 box를 표시합니다. 해당 위치를 찾지 못하거나 마우스를 올려도 표시할 수 없는 상태라면 현재 재생 중인 `video`를 기준으로 좌측 상단에 항상 표시합니다.
 
 <table>
   <tr>
@@ -135,7 +135,7 @@ YouTube 실시간 방송은 플랫폼의 시간 정보가 실제 방송 시간�
 
 ## 동작 방식
 
-Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 시간을 계산합니다.
+Real Time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 시간을 계산합니다.
 
 - 현재 재생 시간
 - 전체 영상 길이
@@ -151,7 +151,7 @@ Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 
 
 - 확장프로그램을 수정했다면 `chrome://extensions`에서 reload합니다.
 - 이미 열려 있던 영상 페이지는 새로고침합니다.
-- popup에서 Real-time 기능이 켜져 있는지 확인합니다.
+- popup에서 Real Time 기능이 켜져 있는지 확인합니다.
 
 ## 참고
 
@@ -161,5 +161,5 @@ Real-time은 현재 페이지의 video에서 다음 값을 읽어 실제 남은 
 ## 개인정보처리방침
 
 - Privacy Policy: https://yunkooo.github.io/real-time/privacy.html
-- Real-time은 popup의 on/off 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
+- Real Time은 popup의 on/off 설정을 저장하기 위해 Chrome `storage` 권한만 사용합니다.
 - 영상의 현재 재생 시간, 전체 길이, 재생 배속은 실제 남은 시간을 계산하기 위해 브라우저 안에서만 읽고, 서버로 전송하거나 저장하지 않습니다.

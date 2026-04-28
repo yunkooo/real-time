@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Realtime",
+  "name": "Real Time",
   "description": "Shows real remaining time based on the current video playback speed.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "icons": {
     "16": "assets/icons/icon_16.png",
     "32": "assets/icons/icon_32.png",
@@ -11,7 +11,7 @@
   },
   "action": {
     "default_popup": "src/popup/index.html",
-    "default_title": "Realtime",
+    "default_title": "Real Time",
     "default_icon": {
       "16": "assets/icons/icon_16.png",
       "32": "assets/icons/icon_32.png",
