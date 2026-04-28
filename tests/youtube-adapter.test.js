@@ -87,14 +87,13 @@ test("youtube adapter keeps normal videos on duration minus current time", () =>
   assert.equal(adapter.getRemainingSeconds({ duration: 600, currentTime: 150 }), 450);
 });
 
-<<<<<<< HEAD
 test("youtube adapter clamps normal videos without live offset", () => {
   const adapter = loadYouTubeAdapter();
 
   assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(13, 4, 10), currentTime: 0 }), maxVideoRemainingSeconds);
 });
 
-test("youtube adapter subtracts live offset before clamping to twelve hours", () => {
+test("youtube adapter subtracts live offset from duration before clamping to twelve hours", () => {
   const adapter = loadYouTubeAdapter({ live: true });
 
   assert.equal(adapter.getRemainingSeconds({ duration: toSeconds(13, 4, 10), currentTime: 0 }), maxVideoRemainingSeconds);
@@ -112,25 +111,29 @@ test("youtube adapter hides live time when offset consumes the remaining time", 
   assert.equal(adapter.getRemainingSeconds({ duration: liveRemainingOffsetSeconds, currentTime: 0 }), null);
 });
 
-test("youtube adapter subtracts live offset from seekable fallback", () => {
-=======
 test("youtube adapter subtracts live offset from the seekable edge before comparing current time", () => {
->>>>>>> 95ff683 (유튜브 라이브 잔여시간 오프셋 보정)
   const adapter = loadYouTubeAdapter({ live: true });
   const video = {
     currentTime: 1000,
     duration: Infinity,
-<<<<<<< HEAD
-    seekable: createSeekable([0, 900], [950, 1180 + liveRemainingOffsetSeconds + 20])
-=======
     seekable: createSeekable([0, 900], [950, 45010])
->>>>>>> 95ff683 (유튜브 라이브 잔여시간 오프셋 보정)
   };
 
   assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 15 * 60);
 });
 
-test("youtube adapter subtracts live offset before clamping to twelve hours", () => {
+test("youtube adapter subtracts live offset from seekable fallback", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+  const video = {
+    currentTime: 1000,
+    duration: Infinity,
+    seekable: createSeekable([0, 900], [950, 1000 + liveRemainingOffsetSeconds + 20])
+  };
+
+  assert.equal(adapter.getRemainingSeconds(video), 20);
+});
+
+test("youtube adapter subtracts live offset from seekable before clamping to twelve hours", () => {
   const adapter = loadYouTubeAdapter({ live: true });
   const liveOffset = 58 * 60 + 30;
   const video = {

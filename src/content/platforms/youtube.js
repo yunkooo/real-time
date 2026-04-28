@@ -60,12 +60,7 @@
         return null;
       }
 
-<<<<<<< HEAD
       const adjustedRemaining = rawRemaining - liveRemainingOffsetSeconds;
-=======
-      const adjustedLiveEdge = liveEdge - liveRemainingOffsetSeconds;
-      const adjustedRemaining = adjustedLiveEdge - currentTime;
->>>>>>> 95ff683 (유튜브 라이브 잔여시간 오프셋 보정)
       return adjustedRemaining > 0 ? clampRemainingSeconds(adjustedRemaining) : null;
     }
 
