@@ -1,20 +1,20 @@
 ---
 name: code-review
-description: 실무형 코드 리뷰를 수행한다. Use when the user asks for code review, PR review, diff review, regression review, maintainability review, security/performance review, or asks in Korean for "코드 리뷰", "검토", "리뷰해줘", "재사용성/확장성/오류/메모리 확인". Focus on actionable findings grounded in changed code, exact file/line references, risk, and missing tests.
+description: 실무형 코드 리뷰를 수행한다. Use when the user asks for code review, diff review, regression review, maintainability review, security/performance review, or asks in Korean for "코드 리뷰", "검토", "리뷰해줘", "재사용성/확장성/오류/메모리 확인". Focus on actionable findings grounded in changed code, exact file/line references, risk, and missing tests.
 ---
 
 # Code Review
 
 ## 기본 원칙
 
-실제 PR 리뷰어처럼 검토한다. 칭찬이나 요약보다 버그, 회귀, 보안, 성능, 유지보수성, 테스트 누락처럼 사용자가 바로 조치할 수 있는 발견 사항을 우선한다.
+실무 코드 리뷰어처럼 검토한다. 칭찬이나 요약보다 버그, 회귀, 보안, 성능, 유지보수성, 테스트 누락처럼 사용자가 바로 조치할 수 있는 발견 사항을 우선한다.
 
 리뷰는 한국어로 작성한다. 사용자가 영어를 요청했거나 코드베이스 관례가 명확히 영어일 때만 영어로 작성한다.
 
 ## 리뷰 범위 잡기
 
 1. 저장소 규칙을 먼저 확인한다. `AGENTS.md`, `agent.md`, `CONTRIBUTING.md`가 있으면 현재 작업에 관련된 규칙을 따른다.
-2. 사용자가 파일, 커밋, 브랜치, PR 범위를 지정했다면 그 범위만 검토한다.
+2. 사용자가 파일, 커밋, 브랜치, diff 범위를 지정했다면 그 범위만 검토한다.
 3. 범위가 없으면 현재 변경사항을 기준으로 본다. `git status`, `git diff`, 필요하면 `git diff --cached`로 staged/unstaged 범위를 분리한다.
 4. 변경된 줄만 보지 말고 해당 함수, 호출부, 상태 흐름, 테스트와 문서 영향까지 필요한 만큼 추적한다.
 5. 사용자 변경사항을 되돌리거나 수정하지 않는다. 리뷰 요청이면 코드 변경 없이 발견 사항을 보고한다.
@@ -87,7 +87,9 @@ description: 실무형 코드 리뷰를 수행한다. Use when the user asks for
 
 사용자가 리뷰 결과를 바탕으로 "수정해줘", "반영해줘"라고 요청하면 리뷰 모드에서 구현 모드로 전환한다. 이때는 먼저 변경 범위를 다시 확인하고, 저장소 규칙에 맞춰 수정과 검증을 진행한다.
 
-수정까지 진행해 코드 변경이 생기면 가능한 한 별도 브랜치와 GitHub PR로 기록을 남긴다. PR 본문에는 다음을 포함한다.
+이 저장소는 확장 프로그램을 `main` 브랜치 기준으로 테스트하므로, 수정까지 진행해 코드 변경이 생겨도 기본 작업은 `main` 기준으로 진행한다. 사용자가 명시적으로 다른 Git 흐름을 요청한 경우에만 그 요청을 따른다.
+
+작업 요약에는 다음을 포함한다.
 
 - 문제 상황 또는 동작하지 않았던 증상
 - 코드 리뷰/검토에서 확인한 원인

@@ -87,6 +87,7 @@ test("youtube adapter keeps normal videos on duration minus current time", () =>
   assert.equal(adapter.getRemainingSeconds({ duration: 600, currentTime: 150 }), 450);
 });
 
+<<<<<<< HEAD
 test("youtube adapter clamps normal videos without live offset", () => {
   const adapter = loadYouTubeAdapter();
 
@@ -112,14 +113,47 @@ test("youtube adapter hides live time when offset consumes the remaining time", 
 });
 
 test("youtube adapter subtracts live offset from seekable fallback", () => {
+=======
+test("youtube adapter subtracts live offset from the seekable edge before comparing current time", () => {
+>>>>>>> 95ff683 (유튜브 라이브 잔여시간 오프셋 보정)
   const adapter = loadYouTubeAdapter({ live: true });
   const video = {
-    currentTime: 1180,
+    currentTime: 1000,
     duration: Infinity,
+<<<<<<< HEAD
     seekable: createSeekable([0, 900], [950, 1180 + liveRemainingOffsetSeconds + 20])
+=======
+    seekable: createSeekable([0, 900], [950, 45010])
+>>>>>>> 95ff683 (유튜브 라이브 잔여시간 오프셋 보정)
   };
 
-  assert.equal(adapter.getRemainingSeconds(video), 20);
+  assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 15 * 60);
+});
+
+test("youtube adapter subtracts live offset before clamping to twelve hours", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+  const liveOffset = 58 * 60 + 30;
+  const video = {
+    currentTime: 1000,
+    duration: Infinity,
+    seekable: createSeekable([0, 1000 + 12 * 60 * 60 + liveOffset])
+  };
+
+  assert.equal(adapter.getRemainingSeconds(video), 12 * 60 * 60);
+});
+
+test("youtube adapter handles YouTube day-style live time values after offsetting the live edge", () => {
+  const adapter = loadYouTubeAdapter({ live: true });
+  const day = 24 * 60 * 60;
+  const currentTime = 52 * day + 3 * 60 * 60 + 7 * 60 + 37;
+  const liveEdge = 52 * day + 15 * 60 * 60 + 49 * 60 + 2;
+  const video = {
+    currentTime,
+    duration: Infinity,
+    seekable: createSeekable([0, liveEdge])
+  };
+
+  assert.equal(adapter.getRemainingSeconds(video), 11 * 60 * 60 + 42 * 60 + 55);
 });
 
 test("youtube adapter hides live time when seekable range is unavailable", () => {
