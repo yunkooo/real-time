@@ -5,7 +5,7 @@
     PANEL_POSITION: "panelPosition"
   };
 
-  const LANGUAGES = ["en", "ko"];
+  const LANGUAGES = ["en", "ko", "ja", "zh-CN", "es", "fr", "de", "pt-BR"];
   const PANEL_POSITIONS = [
     "top-left",
     "top-right",
