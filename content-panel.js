@@ -33,14 +33,6 @@
       ?.classList.remove("realtime-panel-visible");
   }
 
-  function isPanelVisible() {
-    return (
-      document
-        .getElementById(PANEL_ID)
-        ?.classList.contains("realtime-panel-visible") === true
-    );
-  }
-
   function removePanel() {
     document.getElementById(PANEL_ID)?.remove();
   }
@@ -83,7 +75,6 @@
   Realtime.panel = {
     ensurePanel,
     hidePanel,
-    isPanelVisible,
     positionPanel,
     removePanel,
     setPanelContent

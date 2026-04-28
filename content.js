@@ -127,12 +127,6 @@
     hidePanel();
   }
 
-  function hidePanelAndCleanupTrigger() {
-    hidePanelWithMode();
-    removeTriggerListeners?.();
-    removePointerActivityListeners?.();
-  }
-
   function clearInteractionTargets() {
     removeTriggerListeners?.();
     removePointerActivityListeners?.();
@@ -349,15 +343,23 @@
   }
 
   function removeUi(adapter) {
+    resetRuntimeState(adapter, { removePanelElement: true });
+  }
+
+  function resetRuntimeState(adapter, { removePanelElement = false } = {}) {
     clearInteractionTargets();
     removeVideoListeners?.();
     panelMode = "hidden";
-    removePanel();
+    if (removePanelElement) {
+      removePanel();
+    } else {
+      hidePanel();
+    }
     adapter.cleanup?.();
   }
 
   function syncPointerActivityTarget(video, adapter) {
-    const pointerActivityTarget = adapter.findPointerActivityTarget(video);
+    const pointerActivityTarget = adapter.findPointerActivityTarget?.(video) || null;
     removeTriggerListeners?.();
 
     if (!pointerActivityTarget) {
@@ -407,21 +409,19 @@
     cleanupDisconnectedRefs();
 
     if (adapter.isSupportedPage?.() === false) {
-      hidePanelAndCleanupTrigger();
-      removeVideoListeners?.();
+      resetRuntimeState(adapter);
       return;
     }
 
     const video = adapter.findVideo();
     if (!video || !getTimeModel(video, adapter)) {
-      hidePanelAndCleanupTrigger();
-      removeVideoListeners?.();
+      resetRuntimeState(adapter);
       return;
     }
 
     bindVideo(video, adapter);
 
-    if (adapter.findPointerActivityTarget) {
+    if (adapter.interactionMode === "pointer-activity") {
       syncPointerActivityTarget(video, adapter);
       return;
     }
