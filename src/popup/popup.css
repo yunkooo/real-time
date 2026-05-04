@@ -5,7 +5,7 @@ html {
 body {
   background: transparent;
   margin: 0;
-  min-width: 164px;
+  min-width: 236px;
 }
 
 .popup {
@@ -18,10 +18,19 @@ body {
   border: 0;
   color: var(--rt-text);
   display: flex;
+  flex-direction: column;
   gap: 8px;
   justify-content: space-between;
   margin: 0;
-  padding: 7px 12px;
+  padding: 8px 10px 10px;
+}
+
+.popup-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .toggle-card {
@@ -81,8 +90,196 @@ body {
   width: 16px;
 }
 
-.popup:has(input:focus-visible),
+.position-picker {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.position-title {
+  color: var(--rt-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.position-grid {
+  --rt-position-accent: #ff1744;
+  --rt-position-accent-shadow: rgba(255, 23, 68, 0.18);
+  --rt-position-frame: #050609;
+  --rt-position-preview: #f0f3f8;
+  --rt-position-selected: var(--rt-switch-on);
+  --rt-position-selected-shadow: rgba(37, 99, 235, 0.16);
+  --rt-position-selected-soft: rgba(37, 99, 235, 0.08);
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+}
+
+.position-option {
+  align-items: center;
+  background: var(--rt-surface);
+  border: 1px solid var(--rt-border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  min-height: 48px;
+  padding: 5px;
+  position: relative;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  user-select: none;
+}
+
+.position-option:hover {
+  background: var(--rt-surface-hover);
+}
+
+.position-option:has(input:checked) {
+  background: var(--rt-position-selected-soft);
+  border-color: var(--rt-position-selected);
+  box-shadow: 0 0 0 1px var(--rt-position-selected), 0 8px 16px var(--rt-position-selected-shadow);
+}
+
+.position-option:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px var(--rt-focus-shadow);
+}
+
+.position-option input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.position-preview {
+  align-items: center;
+  background: var(--rt-position-preview);
+  border-radius: 7px;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  width: 100%;
+}
+
+.position-frame {
+  background: var(--rt-position-frame);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  display: block;
+  height: 24px;
+  position: relative;
+  width: 24px;
+}
+
+.position-marker {
+  background: var(--rt-position-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--rt-position-accent-shadow);
+  display: block;
+  height: 7px;
+  position: absolute;
+  width: 7px;
+}
+
+.position-option:has(input[value="top-left"]) .position-marker {
+  left: 4px;
+  top: 4px;
+}
+
+.position-option:has(input[value="top-center"]) .position-marker {
+  left: 50%;
+  top: 4px;
+  transform: translateX(-50%);
+}
+
+.position-option:has(input[value="top-right"]) .position-marker {
+  right: 4px;
+  top: 4px;
+}
+
+.position-option:has(input[value="center-left"]) .position-marker {
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.position-option:has(input[value="center-center"]) .position-marker {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.position-option:has(input[value="center-right"]) .position-marker {
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.position-option:has(input[value="bottom-left"]) .position-marker {
+  bottom: 4px;
+  left: 4px;
+}
+
+.position-option:has(input[value="bottom-center"]) .position-marker {
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.position-option:has(input[value="bottom-right"]) .position-marker {
+  bottom: 4px;
+  right: 4px;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.popup-toolbar:has(input:focus-visible),
 .icon-button:focus-visible {
   box-shadow: inset 0 0 0 2px var(--rt-switch-on), inset 0 0 0 5px var(--rt-focus-shadow);
   outline: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .position-option {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .position-grid {
+    --rt-position-accent: #ff4f73;
+    --rt-position-accent-shadow: rgba(255, 79, 115, 0.28);
+    --rt-position-frame: #05070d;
+    --rt-position-preview: #2c3442;
+    --rt-position-selected: #60a5fa;
+    --rt-position-selected-shadow: rgba(96, 165, 250, 0.3);
+    --rt-position-selected-soft: rgba(96, 165, 250, 0.18);
+  }
+
+  .position-option {
+    background: #242b36;
+    border-color: #445066;
+  }
+
+  .position-option:hover {
+    background: #2b3442;
+    border-color: #5b6881;
+  }
+
+  .position-option:has(input:checked) {
+    background: #1f3144;
+    border-color: var(--rt-position-selected);
+  }
 }

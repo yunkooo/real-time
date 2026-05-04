@@ -11,17 +11,106 @@
 
 <body>
   <main class="popup">
-    <label class="toggle-card" for="enabled">
-      <span class="toggle-label">real time</span>
-      <input id="enabled" class="switch-input" type="checkbox" role="switch">
-      <span class="switch" aria-hidden="true"></span>
-    </label>
-    <button id="open-options" class="icon-button" type="button" aria-label="Open options" title="Options">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"></path>
-        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 1 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.3 7A2 2 0 1 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 1 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
-      </svg>
-    </button>
+    <div class="popup-toolbar">
+      <label class="toggle-card" for="enabled">
+        <span class="toggle-label">real time</span>
+        <input id="enabled" class="switch-input" type="checkbox" role="switch">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+      <button id="open-options" class="icon-button" type="button" aria-label="Open options" title="Options">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"></path>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 1 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.3 7A2 2 0 1 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 1 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <fieldset class="position-picker">
+      <legend class="position-title">패널 위치</legend>
+      <div class="position-grid">
+        <label class="position-option" title="Top left">
+          <input type="radio" name="panel-position" value="top-left" checked>
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Top left</span>
+        </label>
+        <label class="position-option" title="Top center">
+          <input type="radio" name="panel-position" value="top-center">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Top center</span>
+        </label>
+        <label class="position-option" title="Top right">
+          <input type="radio" name="panel-position" value="top-right">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Top right</span>
+        </label>
+        <label class="position-option" title="Center left">
+          <input type="radio" name="panel-position" value="center-left">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Center left</span>
+        </label>
+        <label class="position-option" title="Center">
+          <input type="radio" name="panel-position" value="center-center">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Center</span>
+        </label>
+        <label class="position-option" title="Center right">
+          <input type="radio" name="panel-position" value="center-right">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Center right</span>
+        </label>
+        <label class="position-option" title="Bottom left">
+          <input type="radio" name="panel-position" value="bottom-left">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Bottom left</span>
+        </label>
+        <label class="position-option" title="Bottom center">
+          <input type="radio" name="panel-position" value="bottom-center">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Bottom center</span>
+        </label>
+        <label class="position-option" title="Bottom right">
+          <input type="radio" name="panel-position" value="bottom-right">
+          <span class="position-preview" aria-hidden="true">
+            <span class="position-frame">
+              <span class="position-marker"></span>
+            </span>
+          </span>
+          <span class="visually-hidden">Bottom right</span>
+        </label>
+      </div>
+    </fieldset>
   </main>
   <script src="../shared/settings.js"></script>
   <script src="popup.js"></script>
