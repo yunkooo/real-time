@@ -1,12 +1,46 @@
-const { DEFAULT_STATE, STORAGE_KEYS, normalizePanelPosition } = window.RealtimeSettings;
+const { DEFAULT_STATE, STORAGE_KEYS, normalizeLanguage, normalizePanelPosition } = window.RealtimeSettings;
 const STORAGE_KEY = STORAGE_KEYS.ENABLED;
 
 const enabledInput = document.querySelector("#enabled");
 const optionsButton = document.querySelector("#open-options");
+const positionTitle = document.querySelector("#position-title");
 const panelPositionInputs = [...document.querySelectorAll('input[name="panel-position"]')];
+
+const translations = {
+  en: {
+    positionTitle: "Panel position"
+  },
+  ko: {
+    positionTitle: "패널 위치"
+  },
+  ja: {
+    positionTitle: "パネルの位置"
+  },
+  "zh-CN": {
+    positionTitle: "面板位置"
+  },
+  es: {
+    positionTitle: "Posición del panel"
+  },
+  fr: {
+    positionTitle: "Position du panneau"
+  },
+  de: {
+    positionTitle: "Panelposition"
+  },
+  "pt-BR": {
+    positionTitle: "Posição do painel"
+  }
+};
 
 function updateEnabled(enabled) {
   enabledInput.checked = enabled;
+}
+
+function updateLanguage(language) {
+  const nextLanguage = normalizeLanguage(language);
+  document.documentElement.lang = nextLanguage;
+  positionTitle.textContent = translations[nextLanguage]?.positionTitle || translations.en.positionTitle;
 }
 
 function updatePanelPosition(position) {
@@ -18,6 +52,7 @@ function updatePanelPosition(position) {
 
 chrome.storage.sync.get(DEFAULT_STATE, (items) => {
   updateEnabled(items[STORAGE_KEY] !== false);
+  updateLanguage(items[STORAGE_KEYS.LANGUAGE]);
   updatePanelPosition(items[STORAGE_KEYS.PANEL_POSITION]);
 });
 
@@ -50,6 +85,9 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
   if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.ENABLED)) {
     updateEnabled(changes[STORAGE_KEYS.ENABLED].newValue !== false);
+  }
+  if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.LANGUAGE)) {
+    updateLanguage(changes[STORAGE_KEYS.LANGUAGE].newValue);
   }
   if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.PANEL_POSITION)) {
     updatePanelPosition(changes[STORAGE_KEYS.PANEL_POSITION].newValue);

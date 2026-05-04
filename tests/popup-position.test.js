@@ -44,6 +44,7 @@ function loadPopupRuntime(storedItems = {}) {
   const inputs = expectedPositions.map(createInput);
   const enabledInput = createInput("enabled");
   const optionsButton = { addEventListener() {} };
+  const positionTitle = { textContent: "" };
   const settings = loadSettings();
   const state = { ...settings.DEFAULT_STATE, ...storedItems };
   const writes = [];
@@ -70,12 +71,16 @@ function loadPopupRuntime(storedItems = {}) {
       }
     },
     document: {
+      documentElement: {},
       querySelector(selector) {
         if (selector === "#enabled") {
           return enabledInput;
         }
         if (selector === "#open-options") {
           return optionsButton;
+        }
+        if (selector === "#position-title") {
+          return positionTitle;
         }
         return null;
       },
@@ -95,7 +100,7 @@ function loadPopupRuntime(storedItems = {}) {
     filename: "src/popup/popup.js"
   });
 
-  return { context, enabledInput, inputs, onChanged, settings, writes };
+  return { context, enabledInput, inputs, onChanged, positionTitle, settings, writes };
 }
 
 test("popup exposes all panel position choices", () => {
@@ -104,8 +109,33 @@ test("popup exposes all panel position choices", () => {
     (match) => match[1]
   );
 
-  assert.match(html, /<legend class="position-title">패널 위치<\/legend>/);
+  assert.match(html, /<legend id="position-title" class="position-title">패널 위치<\/legend>/);
   assert.deepEqual(positions, expectedPositions);
+});
+
+test("popup position title follows the stored options language", () => {
+  const { positionTitle } = loadPopupRuntime({
+    language: "ja"
+  });
+
+  assert.equal(positionTitle.textContent, "パネルの位置");
+});
+
+test("popup position title updates when options language changes", () => {
+  const { onChanged, positionTitle, settings } = loadPopupRuntime({
+    language: "en"
+  });
+
+  onChanged(
+    {
+      [settings.STORAGE_KEYS.LANGUAGE]: {
+        newValue: "ko"
+      }
+    },
+    "sync"
+  );
+
+  assert.equal(positionTitle.textContent, "패널 위치");
 });
 
 test("popup syncs the selected panel position with storage", () => {
