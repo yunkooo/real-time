@@ -88,8 +88,11 @@
   function findActiveVideo() {
     const videos = [...document.querySelectorAll("video")];
     const visibleVideos = videos.filter(isVisibleElement);
+    const largestVisibleVideo = [...visibleVideos]
+      .filter((video) => video.readyState > 0)
+      .sort((a, b) => getElementArea(b) - getElementArea(a))[0];
     return (
-      visibleVideos.find((video) => !video.paused && video.readyState > 0) ||
+      largestVisibleVideo ||
       visibleVideos.find((video) => video.readyState > 0) ||
       videos.find((video) => !video.paused && video.readyState > 0) ||
       videos.find((video) => video.readyState > 0) ||
@@ -118,6 +121,11 @@
 
     const style = getComputedStyle(element);
     return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) !== 0;
+  }
+
+  function getElementArea(element) {
+    const rect = element?.getBoundingClientRect?.();
+    return Math.max(rect?.width || 0, 0) * Math.max(rect?.height || 0, 0);
   }
 
   function findFirstVisibleElement(elements) {

@@ -36,6 +36,7 @@
     }
 
     return createVideoAdapter({
+      fallbackOnUnusableTrigger: false,
       isSupportedPage,
       findTrigger() {
         return findSpeedControl();

@@ -173,6 +173,43 @@ test("content runtime accepts adapter remaining seconds for infinite duration vi
   assert.ok(calls.contentModels.some((model) => model.realRemaining === 20));
 });
 
+test("content runtime hides instead of falling back when adapter disables unusable trigger fallback", async () => {
+  const video = {
+    currentTime: 10,
+    duration: 70,
+    addEventListener() {},
+    removeEventListener() {}
+  };
+  const trigger = {
+    isConnected: true,
+    matches() {
+      return false;
+    }
+  };
+  const adapter = {
+    fallbackOnUnusableTrigger: false,
+    findTrigger() {
+      return trigger;
+    },
+    findVideo() {
+      return video;
+    },
+    isTriggerVisible() {
+      return false;
+    }
+  };
+  const { calls } = loadMainRuntime({
+    adapter,
+    isUsableVideo() {
+      return true;
+    }
+  });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.deepEqual(calls.contentModels, []);
+});
+
 test("content runtime passes stored panel position to panel positioning", async () => {
   const video = {
     currentTime: 10,

@@ -8,12 +8,20 @@
   function createYouTubeAdapter(options = {}) {
     const isSupportedPage = options.isSupportedPage || (() => true);
 
+    function findPlayer() {
+      return document.querySelector("#movie_player") || document.querySelector(".html5-video-player");
+    }
+
+    function findMainVideo() {
+      return findPlayer()?.querySelector("video") || document.querySelector(".html5-video-player video");
+    }
+
     function findTimeDisplay() {
-      return document.querySelector(".html5-video-player .ytp-left-controls .ytp-time-display");
+      return findPlayer()?.querySelector(".ytp-left-controls .ytp-time-display") || null;
     }
 
     function isLiveStream() {
-      return isVisibleElement(document.querySelector(".html5-video-player .ytp-live-badge"));
+      return isVisibleElement(findPlayer()?.querySelector(".ytp-live-badge"));
     }
 
     function clampRemainingSeconds(seconds) {
@@ -78,12 +86,16 @@
     }
 
     return createVideoAdapter({
+      fallbackOnUnusableTrigger: false,
       isSupportedPage,
+      findVideo() {
+        return findMainVideo();
+      },
       findTrigger() {
         return findTimeDisplay();
       },
       isTriggerVisible() {
-        const player = document.querySelector(".html5-video-player");
+        const player = findPlayer();
         return !!player && !player.classList.contains("ytp-autohide");
       },
       getRemainingSeconds

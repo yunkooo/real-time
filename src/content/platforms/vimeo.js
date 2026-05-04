@@ -33,6 +33,7 @@
     }
 
     return createVideoAdapter({
+      fallbackOnUnusableTrigger: false,
       isSupportedPage,
       findTrigger() {
         return findProgressBarContainer();

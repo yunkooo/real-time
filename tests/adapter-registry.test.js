@@ -96,3 +96,35 @@ test("findActiveVideo skips hidden videos before selecting an active video", () 
 
   assert.equal(runtime.video.findActiveVideo(), visiblePausedVideo);
 });
+
+test("findActiveVideo prefers the largest visible video over small playing previews", () => {
+  const mainVideo = {
+    paused: true,
+    readyState: 1,
+    isConnected: true,
+    getBoundingClientRect() {
+      return { width: 960, height: 540 };
+    }
+  };
+  const previewVideo = {
+    paused: false,
+    readyState: 1,
+    isConnected: true,
+    getBoundingClientRect() {
+      return { width: 180, height: 100 };
+    }
+  };
+
+  const runtime = loadContentRuntime({
+    document: {
+      querySelectorAll(selector) {
+        return selector === "video" ? [mainVideo, previewVideo] : [];
+      }
+    },
+    getComputedStyle() {
+      return { display: "block", objectFit: "contain", opacity: "1", visibility: "visible" };
+    }
+  });
+
+  assert.equal(runtime.video.findActiveVideo(), mainVideo);
+});

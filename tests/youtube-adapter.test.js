@@ -26,19 +26,43 @@ function createVisibleElement() {
   };
 }
 
-function loadYouTubeAdapter({ live = false } = {}) {
+function createVisibleVideo(overrides = {}) {
+  return {
+    currentTime: 0,
+    duration: 600,
+    isConnected: true,
+    paused: true,
+    readyState: 1,
+    getBoundingClientRect() {
+      return { width: 1280, height: 720 };
+    },
+    ...overrides
+  };
+}
+
+function loadYouTubeAdapter({ live = false, videos = [] } = {}) {
   const liveBadge = live ? createVisibleElement() : null;
   const player = createVisibleElement();
+  const timeDisplay = createVisibleElement();
+  const mainVideo = videos.find((video) => video.isMainVideo) || videos[0] || createVisibleVideo();
+  player.querySelector = (selector) => {
+    return {
+      ".ytp-left-controls .ytp-time-display": timeDisplay,
+      ".ytp-live-badge": liveBadge,
+      video: mainVideo
+    }[selector] || null;
+  };
   const document = {
     querySelector(selector) {
       return {
         ".html5-video-player": player,
         ".html5-video-player .ytp-live-badge": liveBadge,
-        ".html5-video-player .ytp-left-controls .ytp-time-display": createVisibleElement()
+        ".html5-video-player .ytp-left-controls .ytp-time-display": timeDisplay,
+        ".html5-video-player video": mainVideo
       }[selector] || null;
     },
-    querySelectorAll() {
-      return [];
+    querySelectorAll(selector) {
+      return selector === "video" ? videos : [];
     }
   };
   const window = {
@@ -85,6 +109,31 @@ test("youtube adapter keeps normal videos on duration minus current time", () =>
   const adapter = loadYouTubeAdapter();
 
   assert.equal(adapter.getRemainingSeconds({ duration: 600, currentTime: 150 }), 450);
+});
+
+test("youtube adapter keeps the watch player video when sidebar previews are playing", () => {
+  const mainVideo = createVisibleVideo({
+    isMainVideo: true,
+    paused: true
+  });
+  const sidebarPreviewVideo = createVisibleVideo({
+    duration: 30,
+    paused: false,
+    getBoundingClientRect() {
+      return { width: 168, height: 94 };
+    }
+  });
+  const adapter = loadYouTubeAdapter({
+    videos: [mainVideo, sidebarPreviewVideo]
+  });
+
+  assert.equal(adapter.findVideo(), mainVideo);
+});
+
+test("youtube adapter disables fallback when the main controls are hidden", () => {
+  const adapter = loadYouTubeAdapter();
+
+  assert.equal(adapter.fallbackOnUnusableTrigger, false);
 });
 
 test("youtube adapter clamps normal videos without live offset", () => {
